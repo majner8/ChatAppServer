@@ -77,8 +77,10 @@ public class AuthorizationControler {
 		if(this.userRepo.existsByEmailOrPhoneAndCountryPreflix(value.getEmail(), value.getPhone(), value.getCountryPreflix())) {
 			Log4j2.log.info(this.marker,String.format("Registration was not successful, email or phone has been already registred."
 					+ System.lineSeparator()+" email %s phone_preflix %s phone %s ", value.getEmail(),value.getCountryPreflix(),value.getPhone()));
+	
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}	
+		
 		
 		//email or password is not registred
 		UserEntity newEntity=new UserEntity();
@@ -144,7 +146,6 @@ public class AuthorizationControler {
 		
 		TokenDTO token=this.JWTtoken.generateToken(user.getUserId(), user.getVersion(), value.getDeviceID(), user.isUserActive(), this.autProperties.TokenValidUntil()
 				,log.getCurrentLogId());
-		
 		
 		return ResponseEntity.ok(
 			token);

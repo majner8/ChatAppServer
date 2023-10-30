@@ -1,0 +1,33 @@
+Tech Stack
+	Databáze: MySql 8
+	Jazyk: Java 17
+	Messaging systém: RabbitMQ
+	Aktuální stav:
+	Endpoints
+	
+	Autorizace
+	POST /authorization/login
+		Popis: Přihlášení uživatele.
+		Návratové hodnoty:
+			HttpStatus.FORBIDDEN: Špatný email, telefon nebo heslo.
+			HttpStatus.OK: Úspěšné přihlášení. Vrací JWT token v těle odpovědi.
+
+	POST /authorization/register
+		Popis: Registrace nového uživatele.
+		Návratové hodnoty:
+			HttpStatus.CREATED: Registrace byla úspěšná. Vrací JWT token v těle odpovědi.
+			HttpStatus.CONFLICT: Email nebo telefon již byly zaregistrovány.
+	
+	POST /authorization/finishRegistration
+		Popis: Dokončení registrace.
+		Návratové hodnoty
+			HttpStatus.CONFLICT: Pokud byla registrace dokončena z jiného zařízení,Vrací JWT token s plnými oprávněními v těle odpovědi.
+			HttpStatus.OK: Registrace byla úspěšně dokončena. Vrací JWT token s plnými oprávněními v těle odpovědi.
+
+Následující plány:
+Dokončení testování endpointů pro autorizaci.
+Implementace endpointů pro zpracování WebSocket Handshake.
+Implementace messaging systému-RabbitMQ.
+
+Klíčové komponenty.		
+UnitTesty-chat-application-starter/src/main/java/Test/Authorization
