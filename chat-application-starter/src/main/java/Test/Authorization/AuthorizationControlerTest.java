@@ -2,19 +2,21 @@ package Test.Authorization;
 
 
 
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
+
+import java.util.Optional;
+
+import javax.persistence.OptimisticLockException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -29,7 +31,9 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import AuthorizationDTO.AutorizationRequestDTO;
+import AuthorizationDTO.ChangeUserDetailsDTO;
 import AuthorizationDTO.TokenDTO;
+import Test.WebSocket.WebSocketTest;
 import chat_application_authorization.jwt.JwtTokenInterface;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Logger.Log4j2;
@@ -38,6 +42,7 @@ import chat_application_commonPart.Properties.AuthorizationProperties;
 import chat_application_database.AuthorizationEntity.DeviceIdEntity;
 import chat_application_database.AuthorizationEntity.DeviceIdEntityRepositoryInterface;
 import chat_application_database.AuthorizationEntity.LoginActivityEntityInterface;
+import chat_application_database.AuthorizationEntity.UserEntity;
 import chat_application_database.AuthorizationEntity.UserRepositoryInterface;
 
 @SpringBootTest(classes=Main.Main.class)
@@ -46,6 +51,7 @@ import chat_application_database.AuthorizationEntity.UserRepositoryInterface;
 public class AuthorizationControlerTest {
 
 	
+	private WebSocketTest WebSockeTest= new WebSocketTest(); 
 	//MockBean
 	@Autowired	
 	private BCryptPasswordEncoder BCryptEncoder;
@@ -185,6 +191,92 @@ public class AuthorizationControlerTest {
 		
 		
 		@Test
+		public void FinishAndLoginEndPointTest() {
+			Log4j2.log.info("I am starting FinishEndPointTest");
+			RequestBuilder request;
+			MockHttpServletResponse respo = null;
+			AutorizationRequestDTO value=new AutorizationRequestDTO();
+
+			value.setEmail("tonik.120@seznam.cz");
+			value.setPassword("dsasa");
+			value.setIsDeviceNew(true);
+			try {
+				
+				//first user was not found, then password did not match¨
+				//second time it return generated JWT Token, which will be used to validate finishRegistration
+
+				UserEntity user1=new UserEntity();
+				user1.setPassword("X");
+				UserEntity user2=new UserEntity();
+				user2.setPassword("dsasa");
+				Mockito.when(this.userRepo.findByEmailOrPhoneAndCountryPreflix(Mockito.any(),Mockito.any(), Mockito.any()))
+				.thenReturn(Optional.empty(),Optional.of(user1),Optional.of(user2));
+				
+				request = MockMvcRequestBuilders
+						.post(AuthorizationPath.authorizationPreflix+AuthorizationPath.loginPath)
+				        .contentType(MediaType.APPLICATION_JSON)
+				        .content(this.objectMapper.writeValueAsString(value));
+			
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.FORBIDDEN,HttpStatus.valueOf(respo.getStatus()));
+				//password did not match
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.FORBIDDEN,HttpStatus.valueOf(respo.getStatus()));
+				
+				
+				this.mockMvc.perform(request)
+				.andReturn().getResponse();
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+
+				assertEquals(HttpStatus.OK,HttpStatus.valueOf(respo.getStatus()));
+				TokenDTO actualDto = objectMapper.readValue(respo.getContentAsByteArray(),TokenDTO.class);
+				
+				
+				//finish Registration
+				ChangeUserDetailsDTO finishUser=new ChangeUserDetailsDTO();
+				
+				
+				Mockito.when(this.userRepo.save(Mockito.any()))
+				.thenThrow(new OptimisticLockException());
+				//put token to header
+				request = MockMvcRequestBuilders
+						.patch(AuthorizationPath.authorizationPreflix+AuthorizationPath.finishRegistrationPath)
+				        .contentType(MediaType.APPLICATION_JSON)
+				        .content(this.objectMapper.writeValueAsString(finishUser))
+				        .header(HttpHeaders.AUTHORIZATION, actualDto.getToken());
+			
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.CONFLICT,HttpStatus.valueOf(respo.getStatus()));
+			
+				
+				Mockito.reset(this.userRepo);
+			
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.OK,HttpStatus.valueOf(respo.getStatus()));
+				
+
+				//try to estabilishWebSocketConnection
+				this.WebSockeTest.WebSocketConnectionEstabilishTest(actualDto.getToken());
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+	
+		}
+		
+		@Test
 		public void EndPointWithCorrectValue() {
 			Log4j2.log.info("I am starting registerEndPointTest");
 			RequestBuilder request;
@@ -277,7 +369,7 @@ public class AuthorizationControlerTest {
 			try {
 				//verify null
 				request = MockMvcRequestBuilders
-						.post(AuthorizationPath.authorizationPreflix+AuthorizationPath.finishRegistrationPath)
+						.patch(AuthorizationPath.authorizationPreflix+AuthorizationPath.finishRegistrationPath)
 				        .contentType(MediaType.APPLICATION_JSON)
 				        .content(this.objectMapper.writeValueAsString(null));
 				MockHttpServletResponse respo=
@@ -294,9 +386,6 @@ public class AuthorizationControlerTest {
 		
 		
 		@Test
-	
-		
-
 		public void test() {
 		
 			try {

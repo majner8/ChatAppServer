@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import AuthorizationDTO.AutorizationRequestDTO;
 import AuthorizationDTO.ChangeUserDetailsDTO;
 import AuthorizationDTO.TokenDTO;
-import chat_application_authorization.Security.CustomUserDetails;
 import chat_application_authorization.jwt.JwtTokenInterface;
+import chat_application_commonPart.Authorization.CustomUserDetails;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.PathProperties.AuthorizationPath;
@@ -106,6 +107,7 @@ public class AuthorizationControler {
 		
 		
 		
+		
 		Log4j2.log.info(this.marker,String.format("Registration was successful"
 				+ System.lineSeparator()+" email %s phone_preflix %s phone %s ", value.getEmail(),value.getCountryPreflix(),value.getPhone()));
 		// save/verify userDevice
@@ -128,6 +130,7 @@ public class AuthorizationControler {
 					+ System.lineSeparator()+" email %s phone_preflix %s phone %s ", value.getEmail(),value.getCountryPreflix(),value.getPhone()));
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
+		
 		
 		UserEntity user=opPassword.get();
 		
@@ -152,12 +155,13 @@ public class AuthorizationControler {
 	}
 	
 	
-	@PostMapping(AuthorizationPath.finishRegistrationPath)
+	@PatchMapping(AuthorizationPath.finishRegistrationPath)
 	public ResponseEntity<TokenDTO> finishRegistration(
 			@ChangeUserDetailsRequestValidator ChangeUserDetailsDTO value,
 			@AuthenticationPrincipal CustomUserDetails userDetails
 			){
-		Optional<UserFinishAuthorization>userFinish=this.userRepo.findById(0);
+		Optional<UserFinishAuthorization>userFinish=this.userRepo.findById(userDetails.getDeviceId());
+		
 		if(userFinish.isEmpty()) {
 			//user by id was not find
 			Log4j2.log.error(this.marker,String.format("Finish operation was not sucessfull"+System.lineSeparator()

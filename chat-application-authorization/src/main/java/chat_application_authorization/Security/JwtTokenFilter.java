@@ -23,6 +23,7 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import chat_application_authorization.jwt.JwtTokenInterface;
+import chat_application_commonPart.Authorization.CustomUserDetails;
 import chat_application_commonPart.Config.SecurityConfiguration;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.PathProperties.AuthorizationPath;
@@ -35,6 +36,7 @@ import chat_application_commonPart.PathProperties.AuthorizationPath;
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter  {
 
+	
 	
 	public JwtTokenFilter() {
 	}
@@ -50,6 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter  {
 			filterChain.doFilter(request, response);
 			return;
 		}
+		
 		
 		
 		
@@ -79,6 +82,7 @@ public class JwtTokenFilter extends OncePerRequestFilter  {
 			
 		}
 		
+		
 		if(user==null) {
 			Log4j2.log.info(Log4j2.LogMarker.Security.getMarker(),"jwt TokenFilter Unautorizate");
 
@@ -88,7 +92,6 @@ public class JwtTokenFilter extends OncePerRequestFilter  {
 		Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()); 
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		filterChain.doFilter(request, response);
-		
 	}
 	
 

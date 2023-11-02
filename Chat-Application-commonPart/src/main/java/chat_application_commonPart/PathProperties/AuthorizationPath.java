@@ -11,5 +11,6 @@ public class AuthorizationPath {
 	
 
 	public static final String finishRegistrationPath="/finishRegistration";
-	
+
+
 }

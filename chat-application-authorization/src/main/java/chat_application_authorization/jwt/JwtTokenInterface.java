@@ -70,6 +70,7 @@ public interface JwtTokenInterface {
 
 			return null;
 		 }	
+		
 		//remove preflix
 		header=header.replace(SecurityConfiguration.jwtTokenPreflix, "");
 		

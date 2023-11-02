@@ -1,4 +1,4 @@
-package chat_application_authorization.Security;
+package chat_application_commonPart.Authorization;
 
 import java.util.Collection;
 
@@ -15,7 +15,7 @@ public class CustomUserDetails implements UserDetails{
 	private String userID;
 	private int deviceId;
 	private long logId;
-	
+	private String WebSocketId;
 	public int getDeviceId() {
 		return deviceId;
 	}
@@ -55,7 +55,18 @@ public class CustomUserDetails implements UserDetails{
 	}
 
 
-
+	public String getWebSocketId() {
+		return this.WebSocketId;
+	}
+	
+	public synchronized void setWebSocketId(String WebSocketID) {
+		if(this.WebSocketId!=null) {
+			Log4j2.log.warn(Log4j2.LogMarker.WebSocket.getMarker(),"WebSocketId has been set before, actual attemp of WebSocketId was skipped");
+			return;
+		}
+		this.WebSocketId=WebSocketID;
+			
+	}
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub

@@ -16,4 +16,6 @@ public class SecurityConfiguration {
 	//each login has own id
 	public static final String loginIdClaimName="LoginId";
 	
+	
+
 }

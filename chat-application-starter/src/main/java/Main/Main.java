@@ -18,7 +18,7 @@ import chat_application_commonPart.Logger.Log4j2;
 
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-@ComponentScan(basePackages = {"Main","Bean","chat_application_authorization","chat_application_commonPart"
+@ComponentScan(basePackages = {"Test"+"Main","Bean","chat_application_authorization","chat_application_commonPart"
 		,"chat_application_database"})
 @EntityScan(basePackages={"chat_application_database"})
 @EnableJpaRepositories(basePackages = {"chat_application_database"})

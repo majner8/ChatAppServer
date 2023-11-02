@@ -29,9 +29,10 @@ public @interface ChangeUserDetailsRequestValidator {
     	     context.disableDefaultConstraintViolation();
     	        context.buildConstraintViolationWithTemplate("Custom message based on condition.")
     	               .addConstraintViolation();
-    		return false;
+    		return true;
     	}    	
     }
 
+    
 
 }
