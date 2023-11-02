@@ -19,7 +19,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private JwtTokenFilter filter;
 	 @Override
 	 protected void configure(HttpSecurity http)throws Exception {
-		 
 		 http.csrf().disable()
 		 .formLogin().disable()
 		 .logout().disable()	
@@ -27,9 +26,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		 .and() 
 		 .addFilterAfter(this.filter,BasicAuthenticationFilter.class)
 		 .authorizeRequests()
-		 .antMatchers(AuthorizationPath.authorizationPreflix+"/**").permitAll()
+		 .antMatchers(AuthorizationPath.authorizationPreflix+AuthorizationPath.loginPath).permitAll()
+		 .antMatchers(AuthorizationPath.authorizationPreflix+AuthorizationPath.registerPath).permitAll()
+
 		 .antMatchers(new String[] {} ).permitAll()
-		 .antMatchers(AuthorizationPath.authorizationPreflix+AuthorizationPath.finishRegistrationPath).authenticated()
 		 .anyRequest().authenticated();
 		 
 	 }

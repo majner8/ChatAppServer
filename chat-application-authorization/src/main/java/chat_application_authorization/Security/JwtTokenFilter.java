@@ -45,13 +45,14 @@ public class JwtTokenFilter extends OncePerRequestFilter  {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		
+
         // If the request URI is for authorization (login or registration), skip JWT verification
 		if(request.getRequestURI().equals(AuthorizationPath.authorizationPreflix+AuthorizationPath.loginPath)
 			||request.getRequestURI().equals(AuthorizationPath.authorizationPreflix+AuthorizationPath.registerPath)	) {
 			filterChain.doFilter(request, response);
 			return;
 		}
+		
 		
 		
 		
@@ -91,6 +92,7 @@ public class JwtTokenFilter extends OncePerRequestFilter  {
 		}
 		Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()); 
 		SecurityContextHolder.getContext().setAuthentication(auth);
+
 		filterChain.doFilter(request, response);
 	}
 	

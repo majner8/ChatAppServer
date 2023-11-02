@@ -62,7 +62,8 @@ public class AuthorizationControlerTest {
 	@Autowired	
 	private JwtTokenInterface JWTtoken;
 	 
-	
+	@Autowired
+	private MockMvc mockMvc;
 
 	
 	@MockBean
@@ -74,9 +75,6 @@ public class AuthorizationControlerTest {
 	
 	
 
-	//simulate request
-	 private MockMvc mockMvc;
-	 
 		@Autowired	
 	 private ObjectMapper objectMapper;
 
@@ -84,13 +82,6 @@ public class AuthorizationControlerTest {
 		private WebApplicationContext wac;
 
 
-		@BeforeEach
-		public void setup() {
-		    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-		    
-		}
-	
-		
 	
 		
 		
@@ -191,92 +182,6 @@ public class AuthorizationControlerTest {
 		
 		
 		@Test
-		public void FinishAndLoginEndPointTest() {
-			Log4j2.log.info("I am starting FinishEndPointTest");
-			RequestBuilder request;
-			MockHttpServletResponse respo = null;
-			AutorizationRequestDTO value=new AutorizationRequestDTO();
-
-			value.setEmail("tonik.120@seznam.cz");
-			value.setPassword("dsasa");
-			value.setIsDeviceNew(true);
-			try {
-				
-				//first user was not found, then password did not match¨
-				//second time it return generated JWT Token, which will be used to validate finishRegistration
-
-				UserEntity user1=new UserEntity();
-				user1.setPassword("X");
-				UserEntity user2=new UserEntity();
-				user2.setPassword("dsasa");
-				Mockito.when(this.userRepo.findByEmailOrPhoneAndCountryPreflix(Mockito.any(),Mockito.any(), Mockito.any()))
-				.thenReturn(Optional.empty(),Optional.of(user1),Optional.of(user2));
-				
-				request = MockMvcRequestBuilders
-						.post(AuthorizationPath.authorizationPreflix+AuthorizationPath.loginPath)
-				        .contentType(MediaType.APPLICATION_JSON)
-				        .content(this.objectMapper.writeValueAsString(value));
-			
-				respo=
-						this.mockMvc.perform(request)
-						.andReturn().getResponse();
-				assertEquals(HttpStatus.FORBIDDEN,HttpStatus.valueOf(respo.getStatus()));
-				//password did not match
-				respo=
-						this.mockMvc.perform(request)
-						.andReturn().getResponse();
-				assertEquals(HttpStatus.FORBIDDEN,HttpStatus.valueOf(respo.getStatus()));
-				
-				
-				this.mockMvc.perform(request)
-				.andReturn().getResponse();
-				respo=
-						this.mockMvc.perform(request)
-						.andReturn().getResponse();
-
-				assertEquals(HttpStatus.OK,HttpStatus.valueOf(respo.getStatus()));
-				TokenDTO actualDto = objectMapper.readValue(respo.getContentAsByteArray(),TokenDTO.class);
-				
-				
-				//finish Registration
-				ChangeUserDetailsDTO finishUser=new ChangeUserDetailsDTO();
-				
-				
-				Mockito.when(this.userRepo.save(Mockito.any()))
-				.thenThrow(new OptimisticLockException());
-				//put token to header
-				request = MockMvcRequestBuilders
-						.patch(AuthorizationPath.authorizationPreflix+AuthorizationPath.finishRegistrationPath)
-				        .contentType(MediaType.APPLICATION_JSON)
-				        .content(this.objectMapper.writeValueAsString(finishUser))
-				        .header(HttpHeaders.AUTHORIZATION, actualDto.getToken());
-			
-				respo=
-						this.mockMvc.perform(request)
-						.andReturn().getResponse();
-				assertEquals(HttpStatus.CONFLICT,HttpStatus.valueOf(respo.getStatus()));
-			
-				
-				Mockito.reset(this.userRepo);
-			
-				respo=
-						this.mockMvc.perform(request)
-						.andReturn().getResponse();
-				assertEquals(HttpStatus.OK,HttpStatus.valueOf(respo.getStatus()));
-				
-
-				//try to estabilishWebSocketConnection
-				this.WebSockeTest.WebSocketConnectionEstabilishTest(actualDto.getToken());
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-	
-		}
-		
-		@Test
 		public void EndPointWithCorrectValue() {
 			Log4j2.log.info("I am starting registerEndPointTest");
 			RequestBuilder request;
@@ -361,6 +266,101 @@ public class AuthorizationControlerTest {
 			
 			
 		}
+	
+		
+		@Test
+		public void FinishAndLoginEndPointTest() {
+			Log4j2.log.info("I am starting FinishEndPointTest");
+			RequestBuilder request;
+			MockHttpServletResponse respo = null;
+			AutorizationRequestDTO value=new AutorizationRequestDTO();
+
+			value.setEmail("tonik.120@seznam.cz");
+			value.setPassword("dsasa");
+			value.setIsDeviceNew(true);
+			try {
+				
+				//first user was not found, then password did not match¨
+				//second time it return generated JWT Token, which will be used to validate finishRegistration
+				UserEntity user1=new UserEntity();
+				user1.setPassword(this.BCryptEncoder.encode("X"));
+				UserEntity user2=new UserEntity();
+				user2.setPassword(this.BCryptEncoder.encode("dsasa"));
+				Mockito.when(this.userRepo.findByEmailOrPhoneAndCountryPreflix(Mockito.any(),Mockito.any(), Mockito.any()))
+				.thenReturn(Optional.empty(),Optional.of(user1),Optional.of(user2));
+				
+				request = MockMvcRequestBuilders
+						.post(AuthorizationPath.authorizationPreflix+AuthorizationPath.loginPath)
+				        .contentType(MediaType.APPLICATION_JSON)
+				        .content(this.objectMapper.writeValueAsString(value));
+			
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.FORBIDDEN,HttpStatus.valueOf(respo.getStatus()));
+				//password did not match
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.FORBIDDEN,HttpStatus.valueOf(respo.getStatus()));
+				
+
+				//Set id generation
+				Mockito.when(this.device.DeviceIdGeneration(Mockito.any(), Mockito.any()))
+				.then((argument)->{
+					DeviceIdEntity device=new DeviceIdEntity();
+					device.setDeviceID(1);
+					return device;
+				});
+				
+				this.mockMvc.perform(request)
+				.andReturn().getResponse();
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+
+				assertEquals(HttpStatus.OK,HttpStatus.valueOf(respo.getStatus()));
+				TokenDTO actualDto = objectMapper.readValue(respo.getContentAsByteArray(),TokenDTO.class);
+				
+				
+				//finish Registration
+				ChangeUserDetailsDTO finishUser=new ChangeUserDetailsDTO();
+				
+				
+				Mockito.when(this.userRepo.save(Mockito.any()))
+				.thenThrow(new OptimisticLockException());
+				//put token to header
+				request = MockMvcRequestBuilders
+						.patch(AuthorizationPath.authorizationPreflix+AuthorizationPath.finishRegistrationPath)
+				        .contentType(MediaType.APPLICATION_JSON)
+				        .content(this.objectMapper.writeValueAsString(finishUser))
+				        .header(HttpHeaders.AUTHORIZATION, actualDto.getToken());
+			
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.CONFLICT,HttpStatus.valueOf(respo.getStatus()));
+			
+				
+				Mockito.reset(this.userRepo);
+			
+				respo=
+						this.mockMvc.perform(request)
+						.andReturn().getResponse();
+				assertEquals(HttpStatus.OK,HttpStatus.valueOf(respo.getStatus()));
+				
+
+				//try to estabilishWebSocketConnection
+				this.WebSockeTest.WebSocketConnectionEstabilishTest(actualDto.getToken());
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+	
+		}
+	
 		
 		@Test
 		public void testAuthorizatedPath() {
