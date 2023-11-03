@@ -60,6 +60,8 @@ public class JwtTokenFilter extends OncePerRequestFilter  {
 		CustomUserDetails user;
 		DecodedJWT jwt=	this.tokenValidation.tokenValidation(request);
 		if(jwt==null) {
+			Log4j2.log.info(Log4j2.LogMarker.Security.getMarker(),"jwt TokenFilter Unautorizate");
+
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			 return;
 		}

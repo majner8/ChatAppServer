@@ -59,9 +59,7 @@ public class AuthorizationControlerTest {
 	private AuthorizationProperties autProperties;
 	@Autowired	
 	private HttpServletRequestInetAdress inetAdress;
-	@Autowired	
-	private JwtTokenInterface JWTtoken;
-	 
+	
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -78,11 +76,11 @@ public class AuthorizationControlerTest {
 		@Autowired	
 	 private ObjectMapper objectMapper;
 
-		@Autowired
-		private WebApplicationContext wac;
 
 
-	
+		public AuthorizationControlerTest() {
+			
+		}
 		
 		
 		

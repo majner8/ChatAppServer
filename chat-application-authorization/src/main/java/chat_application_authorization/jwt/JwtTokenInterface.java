@@ -56,7 +56,7 @@ public interface JwtTokenInterface {
 		TokenDTO token=new TokenDTO();
 		token.setUserActive(isUserActive);
 		token.setValidUntil(validUntil.getTime());
-		token.setToken(jwtBuilder.sign(Algorithm.HMAC512(SecurityConfiguration.hashTokenPassword)));
+		token.setToken(SecurityConfiguration.jwtTokenPreflix+jwtBuilder.sign(Algorithm.HMAC512(SecurityConfiguration.hashTokenPassword)));
 		return token;
 	}
 

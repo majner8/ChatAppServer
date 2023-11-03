@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="info">
+<Configuration status="INFO">
     <Appenders>
         <!-- Define Console Appender -->
         <Console name="ConsoleAppender" target="SYSTEM_OUT">
@@ -9,7 +9,7 @@
 
     <Loggers>
         <!-- Setup root logger with console appender -->
-        <Root level="info">
+        <Root level="INFO">
             <AppenderRef ref="ConsoleAppender"/>
         </Root>
 
