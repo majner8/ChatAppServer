@@ -111,9 +111,7 @@ public class AuthorizationControler {
 		Log4j2.log.info(this.marker,String.format("Registration was successful"
 				+ System.lineSeparator()+" email %s phone_preflix %s phone %s ", value.getEmail(),value.getCountryPreflix(),value.getPhone()));
 		// save/verify userDevice
-		
 		logAuthorization log=this.logDevice(newEntity, value.getDeviceID(), request);
-		value.setDeviceID(log.getDevice().getDeviceID());
 		
 		TokenDTO token=this.JWTtoken.generateToken(newEntity.getUserId(), newEntity.getVersion(), value.getDeviceID(), false, this.autProperties.TokenValidUntil(),log.getCurrentLogId());
 		return ResponseEntity.status(HttpStatus.CREATED).body(token);
@@ -143,7 +141,6 @@ public class AuthorizationControler {
 		
 		
 		logAuthorization log=this.logDevice(user, value.getDeviceID(), request);
-		value.setDeviceID(log.getDevice().getDeviceID());
 		
 		TokenDTO token=this.JWTtoken.generateToken(user.getUserId(), user.getVersion(), value.getDeviceID(), user.isUserActive(), this.autProperties.TokenValidUntil()
 				,log.getCurrentLogId());

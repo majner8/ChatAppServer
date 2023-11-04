@@ -68,6 +68,10 @@ public @interface AutorizationRequestDTOValidator {
         		}
         		
         		}
+    		
+    		if(value.getDeviceID()==null) {
+    			
+    		}
     			boolean email=this.validateEmail(value.getEmail());
     			boolean phone=this.validatePhone(value.getCountryPreflix(), value.getPhone());
     			
