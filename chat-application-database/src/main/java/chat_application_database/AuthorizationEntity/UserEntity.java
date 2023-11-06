@@ -51,14 +51,11 @@ public class UserEntity {
 	@Column(name=is_user_activeName)
 	private boolean isUserActive;
 	
-	@Column(name="passwordName")
+	@Column(name=passwordName)
 	private String password;
 	
 	@Version
 	private long version;
-
-	 @OneToMany(mappedBy = DeviceIdEntity.userName)
-	 private List<DeviceIdEntity> devices = new ArrayList<>();
 
 
 	public String getEmail() {
@@ -101,9 +98,6 @@ public class UserEntity {
 		return version;
 	}
 
-	public List<DeviceIdEntity> getDevices() {
-		return devices;
-	}
 
 	public void setEmail(String email) {
 		this.email = email;
@@ -145,9 +139,7 @@ public class UserEntity {
 		this.version = version;
 	}
 
-	public void setDevices(List<DeviceIdEntity> devices) {
-		this.devices = devices;
-	}
+	
 
 	
 	

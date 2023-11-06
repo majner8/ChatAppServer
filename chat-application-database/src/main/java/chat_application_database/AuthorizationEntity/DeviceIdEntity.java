@@ -8,9 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -22,6 +19,8 @@ public class DeviceIdEntity {
     public static final String DeviceIdEntityName = "device_id";
     public static final String activityName = "userActivity";
 
+    
+    
     //generate on database, unique 
     @EmbeddedId
     private CompositePrimaryKey primaryKey;

@@ -14,9 +14,8 @@ import chat_application_database.AuthorizationEntity.DeviceIdEntity.CompositePri
 
 
 // device id will be generated on user by autoIncreament
-public interface DeviceIdEntityRepositoryInterface  extends JpaRepository<DeviceIdEntity,CompositePrimaryKey> { 	
+public interface DeviceIdEntityRepositoryInterfaces  extends JpaRepository<DeviceIdEntity,CompositePrimaryKey> { 	
 	
-	private  String x="";
 	/**Metod verify if id exist in database, otherwise return new generated ID */
 	default DeviceIdEntity DeviceIdGeneration(UserEntity user,Integer deviceID) {
 		if(user==null) {
@@ -29,7 +28,7 @@ public interface DeviceIdEntityRepositoryInterface  extends JpaRepository<Device
 			return id.get();
 		}
 		}
-		EntityManager entityManager;
+		EntityManager entityManager = null;
 
 		entityManager.createNativeQuery(String.format("Select %s from (Insert into %s (%s) values(:%s));",
 				DeviceIdEntity.DeviceIdEntityName,DeviceIdEntity.deviceIdEntityTable
@@ -38,21 +37,21 @@ public interface DeviceIdEntityRepositoryInterface  extends JpaRepository<Device
 		.setParameter(DeviceIdEntity.userIdName, user.getUserId())
 		.executeUpdate();
 		
-		
+		/*
 		entityManager.createQuery("")
-		.getre;
 		entityManager.createNativeQuery(String.format("Insert into %s"
 				+ "(%s) values(%s);",DeviceIdEntity.userIdName,
-			/* values*/user.getUserId()
+			/* valuesuser.getUserId()/*
 				))
 		;
-		
-		
+		*/
+		/*
 		x.create
 		DeviceIdEntity idd=new DeviceIdEntity();
 		idd.setUser(user);
-		this.saveAndFlush(idd);
-		return idd;
+		this.saveAndFlush(idd);*/
+		//return idd;
+			return null;
 	}
 	
 	default  DeviceIdEntity generateDeviceid(UserEntity user) {

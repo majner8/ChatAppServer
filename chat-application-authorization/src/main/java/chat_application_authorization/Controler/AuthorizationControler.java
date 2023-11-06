@@ -51,8 +51,8 @@ public class AuthorizationControler {
 
 	@Autowired
 	private AuthorizationProperties autProperties;
-	@Autowired
-	private DeviceIdEntityRepositoryInterface device;
+	//@Autowired
+	//private DeviceIdEntityRepositoryInterface device;
 	@Autowired
 	private LoginActivityEntityInterface LoginActivity;
 	@Autowired
@@ -189,17 +189,19 @@ public class AuthorizationControler {
 		return ResponseEntity.status(httpStatus).body(token);
 	}
 
-	private logAuthorization logDevice(UserEntity user,int deviceId,
+	private logAuthorization logDevice(UserEntity user,String deviceId,
 			HttpServletRequest request) {
+		
+		return this.LoginActivity.savedNewActivity(new DeviceIdEntity(), this.inetAdress.getInetAdress(request));
 		logAuthorization x=new logAuthorization();
-		x.setDevice(this.device.DeviceIdGeneration(user, deviceId));
+		x.setDevice(deviceId);
 		x.setCurrentLogId(this.LoginActivity.savedNewActivity(x.getDevice(), this.inetAdress.getInetAdress(request)));;
 		return x;
 	}
 	
 	
 	private static class logAuthorization{
-		private int currentLogId;
+		private String currentLogId;
 		private  DeviceIdEntity device;
 		public int getCurrentLogId() {
 			return currentLogId;

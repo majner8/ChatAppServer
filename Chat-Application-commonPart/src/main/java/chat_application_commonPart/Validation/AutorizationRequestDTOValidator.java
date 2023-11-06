@@ -64,13 +64,13 @@ public @interface AutorizationRequestDTOValidator {
         			Log4j2.log.trace(Log4j2.LogMarker.Validation.getMarker(),"Device id: "+value.getDeviceID());
         			Log4j2.log.trace(Log4j2.LogMarker.Validation.getMarker(),"Email: "+value.getEmail());
         			Log4j2.log.trace(Log4j2.LogMarker.Validation.getMarker(),"Password: "+value.getPassword());
-        			Log4j2.log.trace(Log4j2.LogMarker.Validation.getMarker(),"does device new: "+value.getIsDeviceNew());
         		}
         		
         		}
     		
     		if(value.getDeviceID()==null) {
-    			
+   	        	Log4j2.log.debug(Log4j2.LogMarker.Validation.getMarker(),"DeviceID validation failed, device is null");
+   	        	return false;
     		}
     			boolean email=this.validateEmail(value.getEmail());
     			boolean phone=this.validatePhone(value.getCountryPreflix(), value.getPhone());

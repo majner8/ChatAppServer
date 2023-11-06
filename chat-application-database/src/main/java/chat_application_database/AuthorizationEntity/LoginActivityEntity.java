@@ -9,19 +9,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-@Entity(name = LoginActivityEntity.loginActivityEntityName)
+import javax.persistence.OneToOne;
+@Entity(name = LoginActivityEntity.loginActivityEntityTable)
 public class LoginActivityEntity {
 
-    public static final String loginActivityEntityName = "some_name";  // You need to provide a proper name
-    public static final String inetAdressName = "ip_adress";
+    public static final String loginActivityEntityTable = "some_name";  // You need to provide a proper name
     public static final String loginTimeName = "login_Time";
     public static final String logoutTimeName = "logout_Time";
     public static final String PrimaryKeyName = "primary_key";
     public static final String deviceIdName = "device";
-
-    @Column(name = inetAdressName)
-    private String inetAdress;
-
+    public static final String userIdName="userId";
+   
     @Column(name = loginTimeName)
     private LocalDateTime loginTime;
 
@@ -30,20 +28,16 @@ public class LoginActivityEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @OneToOne
+    @JoinColumn(name = Htpp_Request_Login_Entity.Htpp_Request_Login_Entity_PrimaryKeyName)
     @Column(name = PrimaryKeyName)
-    private int primaryKey;
+    private long primaryKey;
 
-    @ManyToOne
-    @JoinColumn(name = DeviceIdEntity.DeviceIdEntityName)
-    private DeviceIdEntity device;
+    @Column(name=LoginActivityEntity.deviceIdName)
+    private String deviceId;
+    @Column(name=LoginActivityEntity.userIdName)
+    private String userId;
 
-	public String getInetAdress() {
-		return inetAdress;
-	}
-
-	public void setInetAdress(String inetAdress) {
-		this.inetAdress = inetAdress;
-	}
 
 	public LocalDateTime getLoginTime() {
 		return loginTime;
@@ -61,21 +55,10 @@ public class LoginActivityEntity {
 		this.logoutTime = logoutTime;
 	}
 
-	public int getPrimaryKey() {
+	public long getPrimaryKey() {
 		return primaryKey;
 	}
 
-	public void setPrimaryKey(int primaryKey) {
-		this.primaryKey = primaryKey;
-	}
-
-	public DeviceIdEntity getDevice() {
-		return device;
-	}
-
-	public void setDevice(DeviceIdEntity device) {
-		this.device = device;
-	}
 
     // ... getters and setters ...
     
