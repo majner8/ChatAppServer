@@ -28,5 +28,30 @@ public class Htpp_Request_Login_Entity {
     private String EndPointPath;
     @Column(name=Htpp_Request_Login_Entity.Htpp_Request_Login_Entity_serverResponseStatusName, nullable=false)
     private int serverResponseStatus;
+	public long getPrimaryKey() {
+		return primaryKey;
+	}
+	public void setPrimaryKey(long primaryKey) {
+		this.primaryKey = primaryKey;
+	}
+	public String getInetAdress() {
+		return inetAdress;
+	}
+	public void setInetAdress(String inetAdress) {
+		this.inetAdress = inetAdress;
+	}
+	public String getEndPointPath() {
+		return EndPointPath;
+	}
+	public void setEndPointPath(String endPointPath) {
+		EndPointPath = endPointPath;
+	}
+	public int getServerResponseStatus() {
+		return serverResponseStatus;
+	}
+	public void setServerResponseStatus(int serverResponseStatus) {
+		this.serverResponseStatus = serverResponseStatus;
+	}
 	
+    
 }

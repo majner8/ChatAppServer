@@ -32,7 +32,7 @@ public interface JwtTokenInterface {
 	 *@param deviceID -id of device, should not be null,
 	 *@return Metod generate token and return them as DTO
 	 **/
-	default TokenDTO generateToken(String userId,Long Version,int deviceID,boolean isUserActive,Duration tokenValidity,long logId) {
+	default TokenDTO generateToken(String userId,Long Version,String deviceID,boolean isUserActive,Duration tokenValidity,long logId) {
 		
 		
 		Calendar validUntil=Calendar.getInstance();
@@ -44,7 +44,7 @@ public interface JwtTokenInterface {
 		validUntil.add(Calendar.SECOND, (int)(tokenValidity.getSeconds()-minute*60));
 
 		JWTCreator.Builder jwtBuilder= JWT.create()
-				.withSubject(String.valueOf(deviceID))
+				.withSubject(deviceID)
 				.withClaim(SecurityConfiguration.userIsActiveClaimName,String.valueOf(isUserActive) )
 				.withClaim(SecurityConfiguration.userIdClaimName, String.valueOf(userId))
 				//claim contain logId

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +36,7 @@ import chat_application_commonPart.Validation.AutorizationRequestDTOValidator;
 import chat_application_commonPart.Validation.ChangeUserDetailsRequestValidator;
 import chat_application_database.AuthorizationEntity.DeviceIdEntity;
 import chat_application_database.AuthorizationEntity.DeviceIdEntityRepositoryInterface;
+import chat_application_database.AuthorizationEntity.Htpp_Request_Login_Entity;
 import chat_application_database.AuthorizationEntity.LoginActivityEntityInterface;
 import chat_application_database.AuthorizationEntity.UserEntity;
 import chat_application_database.AuthorizationEntity.UserRepositoryInterface;
@@ -68,10 +70,12 @@ public class AuthorizationControler {
 	 }
 	 
 	
+	 //RequestAttribute add by interceptor, to use primary key
 	@PostMapping(AuthorizationPath.registerPath)
 	public ResponseEntity<TokenDTO> register(
 		 @RequestBody @Valid @AutorizationRequestDTOValidator AutorizationRequestDTO value,
-			HttpServletRequest request
+			HttpServletRequest request,
+			@RequestAttribute Htpp_Request_Login_Entity HttpRequestAttribute
 			){
 		
 		
@@ -110,10 +114,8 @@ public class AuthorizationControler {
 		
 		Log4j2.log.info(this.marker,String.format("Registration was successful"
 				+ System.lineSeparator()+" email %s phone_preflix %s phone %s ", value.getEmail(),value.getCountryPreflix(),value.getPhone()));
-		// save/verify userDevice
-		logAuthorization log=this.logDevice(newEntity, value.getDeviceID(), request);
 		
-		TokenDTO token=this.JWTtoken.generateToken(newEntity.getUserId(), newEntity.getVersion(), value.getDeviceID(), false, this.autProperties.TokenValidUntil(),log.getCurrentLogId());
+		TokenDTO token=this.JWTtoken.generateToken(newEntity.getUserId(), newEntity.getVersion(), value.getDeviceID(), false, this.autProperties.TokenValidUntil(), HttpRequestAttribute.getPrimaryKey());
 		return ResponseEntity.status(HttpStatus.CREATED).body(token);
 		}
 	
@@ -189,33 +191,5 @@ public class AuthorizationControler {
 		return ResponseEntity.status(httpStatus).body(token);
 	}
 
-	private logAuthorization logDevice(UserEntity user,String deviceId,
-			HttpServletRequest request) {
-		
-		return this.LoginActivity.savedNewActivity(new DeviceIdEntity(), this.inetAdress.getInetAdress(request));
-		logAuthorization x=new logAuthorization();
-		x.setDevice(deviceId);
-		x.setCurrentLogId(this.LoginActivity.savedNewActivity(x.getDevice(), this.inetAdress.getInetAdress(request)));;
-		return x;
-	}
-	
-	
-	private static class logAuthorization{
-		private String currentLogId;
-		private  DeviceIdEntity device;
-		public int getCurrentLogId() {
-			return currentLogId;
-		}
-		public DeviceIdEntity getDevice() {
-			return device;
-		}
-		public void setCurrentLogId(int currentLogId) {
-			this.currentLogId = currentLogId;
-		}
-		public void setDevice(DeviceIdEntity device) {
-			this.device = device;
-		}
-		
-		
-	}
+
 }

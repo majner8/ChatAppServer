@@ -17,8 +17,8 @@ public class Log4j2 {
 		
 		Security(MarkerManager.getMarker("")),Database(MarkerManager.getMarker("")
 	),Validation(MarkerManager.getMarker(""))
-	,WebSocket(MarkerManager.getMarker(""))
-		;
+	,WebSocket(MarkerManager.getMarker("")),RequestLog(MarkerManager.getMarker("")),
+	RequestLogAuthorization(MarkerManager.getMarker(""));
 		
 		
 		private Marker marker;
