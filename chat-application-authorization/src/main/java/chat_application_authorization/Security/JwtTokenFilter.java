@@ -26,7 +26,7 @@ import chat_application_authorization.jwt.JwtTokenInterface;
 import chat_application_commonPart.Authorization.CustomUserDetails;
 import chat_application_commonPart.Config.SecurityConfiguration;
 import chat_application_commonPart.Logger.Log4j2;
-import chat_application_commonPart.PathProperties.AuthorizationPath;
+import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 
 
 /**

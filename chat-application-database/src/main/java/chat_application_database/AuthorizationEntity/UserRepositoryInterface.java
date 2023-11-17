@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import chat_application_commonPart.Logger.Log4j2;
+import database.User.UserEntity;
 
 
 

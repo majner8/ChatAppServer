@@ -1,4 +1,4 @@
-package chat_application_commonPart.PathProperties;
+package chat_application_commonPart.httpEndPointPath;
 
 public class AuthorizationPath {
 	
@@ -12,5 +12,5 @@ public class AuthorizationPath {
 
 	public static final String finishRegistrationPath="/finishRegistration";
 
-
+	public final static String deviceIdPath="getDeviceToken";
 }

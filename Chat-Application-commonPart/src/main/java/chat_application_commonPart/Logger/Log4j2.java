@@ -13,6 +13,21 @@ public class Log4j2 {
 	
 	
 	
+    public static enum MarkerLog{
+    	Authorization(MarkerManager.getMarker(""));
+    	
+    	private Marker marker;
+		
+    	MarkerLog(Marker marker){
+			this.marker=marker;
+		}
+		
+		public Marker getMarker() {
+			return this.marker;
+		}
+		
+		
+    }
 	public static enum LogMarker{
 		
 		Security(MarkerManager.getMarker("")),Database(MarkerManager.getMarker("")

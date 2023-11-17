@@ -37,13 +37,13 @@ import Test.WebSocket.WebSocketTest;
 import chat_application_authorization.jwt.JwtTokenInterface;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Logger.Log4j2;
-import chat_application_commonPart.PathProperties.AuthorizationPath;
 import chat_application_commonPart.Properties.AuthorizationProperties;
+import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 import chat_application_database.AuthorizationEntity.DeviceIdEntity;
 import chat_application_database.AuthorizationEntity.DeviceIdEntityRepositoryInterface;
 import chat_application_database.AuthorizationEntity.LoginActivityEntityInterface;
-import chat_application_database.AuthorizationEntity.UserEntity;
 import chat_application_database.AuthorizationEntity.UserRepositoryInterface;
+import database.User.UserEntity;
 
 @SpringBootTest(classes=Main.Main.class)
 @AutoConfigureMockMvc

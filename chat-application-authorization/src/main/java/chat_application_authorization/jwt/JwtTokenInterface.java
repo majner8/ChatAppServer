@@ -6,104 +6,119 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 
 import AuthorizationDTO.TokenDTO;
 import chat_application_commonPart.Config.SecurityConfiguration;
-import chat_application_commonPart.Logger.Log4j2;
-import io.jsonwebtoken.UnsupportedJwtException;
+import database.User.UserEntity;
 
-@Component
 public interface JwtTokenInterface {
 
-	/** 
-	 *@param Version - null, if user already finish registration, 
-	 *			otherwise put database 
-	 *		Version in accordance with JPA Optimistic locking
-	 *		Handle situation, where user complete registration from other device
-	 *@param deviceID -id of device, should not be null,
-	 *@return Metod generate token and return them as DTO
-	 **/
-	default TokenDTO generateToken(String userId,Long Version,String deviceID,boolean isUserActive,Duration tokenValidity,long logId) {
-		
-		
+
+	default TokenDTO generateAuthorizationToken(
+			Duration tokenDuration,
+			String deviceID,
+			UserEntity userEntity) {
 		Calendar validUntil=Calendar.getInstance();
 		validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 		validUntil.setTime(new Date());
-		
-		int minute=(int)Math.floor(tokenValidity.getSeconds()/60);
-		validUntil.add(Calendar.MINUTE, minute);
-		validUntil.add(Calendar.SECOND, (int)(tokenValidity.getSeconds()-minute*60));
+		int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
 
-		JWTCreator.Builder jwtBuilder= JWT.create()
-				.withSubject(deviceID)
-				.withClaim(SecurityConfiguration.userIsActiveClaimName,String.valueOf(isUserActive) )
-				.withClaim(SecurityConfiguration.userIdClaimName, String.valueOf(userId))
-				//claim contain logId
-				//use to logOutUserInFuture
-				.withClaim(SecurityConfiguration.loginIdClaimName, logId)
+		validUntil.add(Calendar.MINUTE, minute);
+		validUntil.add(Calendar.SECOND, (int)(tokenDuration.getSeconds()-minute*60));
+
+		JWTCreator.Builder jwtBuilder= 
+				JWT.create()
+				.withSubject(String.valueOf(userEntity.getUserId()))
 				.withIssuedAt(new Date())
+				.withClaim(SecurityConfiguration.DeviceIdClaimName, deviceID)
+				.withClaim(SecurityConfiguration.VersionClaimName,userEntity.getVersion())
+				.withClaim(SecurityConfiguration.userIsActiveClaimName, userEntity.isUserActive())
+				
 				.withExpiresAt(validUntil.getTime());
-	
+
+		if(!userEntity.isUserActive()) {
+			//add userEntity to finish registration
+			//user Entity is just as map
+			jwtBuilder.withClaim(SecurityConfiguration.userEntityClaimName,userEntity.getValues());
+		}
+		String jwtToken=jwtBuilder		
+				.sign(Algorithm.HMAC512
+				(SecurityConfiguration.hashTokenPassword));
+
 		TokenDTO token=new TokenDTO();
-		token.setUserActive(isUserActive);
+		token.setUserActive(userEntity.isUserActive());
 		token.setValidUntil(validUntil.getTime());
-		token.setToken(SecurityConfiguration.jwtTokenPreflix+jwtBuilder.sign(Algorithm.HMAC512(SecurityConfiguration.hashTokenPassword)));
+		token.setToken(jwtToken);
 		return token;
 	}
 
+	default TokenDTO generateAuthorizationTokens(
+			Duration tokenDuration,long userID,
+			String deviceID,
+			boolean isUserActive,
+			//just for non activce user
+			UserEntity userEntity,
+			//not necessary, because activity is managed during WebSocket lifecycle 
+			//long loginId,
+			//verison using during password setting e.t.c
+			//when user change password or any security dat
+			//new token have to be generated
+			long version) {
+		Calendar validUntil=Calendar.getInstance();
+		validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+		validUntil.setTime(new Date());
+		int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
+
+		validUntil.add(Calendar.MINUTE, minute);
+		validUntil.add(Calendar.SECOND, (int)(tokenDuration.getSeconds()-minute*60));
+
+		JWTCreator.Builder jwtBuilder= 
+				JWT.create()
+				.withSubject(String.valueOf(userID))
+				.withIssuedAt(new Date())
+				.withClaim(SecurityConfiguration.DeviceIdClaimName, deviceID)
+				.withClaim(SecurityConfiguration.VersionClaimName,version)
+				.withClaim(SecurityConfiguration.userIsActiveClaimName, isUserActive)
+				
+				.withExpiresAt(validUntil.getTime());
+
+		if(!isUserActive) {
+			//add userEntity to finish registration
+			//user Entity is just as map
+			jwtBuilder.withClaim(SecurityConfiguration.userEntityClaimName,userEntity.getValues());
+		}
+		String jwtToken=jwtBuilder		
+				.sign(Algorithm.HMAC512
+				(SecurityConfiguration.hashTokenPassword));
+
+		TokenDTO token=new TokenDTO();
+		token.setUserActive(isUserActive);
+		token.setValidUntil(validUntil.getTime());
+		token.setToken(jwtToken);
+		return token;
+	}
+	/**Metod generate sign device token.
+	 * @return sign token, with preflix
+	 *  */
+	default String generateDeviceToken(Duration tokenDuration,
+			String deviceID) {
+		Calendar validUntil=Calendar.getInstance();
+		validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+		validUntil.setTime(new Date());
+		int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
+
+		validUntil.add(Calendar.MINUTE, minute);
+		validUntil.add(Calendar.SECOND, (int)(tokenDuration.getSeconds()-minute*60));
+
+		return JWT.create()
+				.withSubject(deviceID)
+				.withIssuedAt(new Date())
+				.withExpiresAt(validUntil.getTime())
+				.sign(Algorithm.HMAC512(SecurityConfiguration.hashTokenPassword));
 	
-	default DecodedJWT tokenValidation(HttpServletRequest request) {
-		Log4j2.log.debug(Log4j2.LogMarker.Security.getMarker(),"Trying verify token");
-		String header=request.getHeader(HttpHeaders.AUTHORIZATION); 
-		
-		if(header==null||header.isEmpty()||!header.startsWith(SecurityConfiguration.jwtTokenPreflix)) {
-			Log4j2.log.debug(Log4j2.LogMarker.Security.getMarker(),"Header do not contain claim authorization or do not start with preflix");
-
-			return null;
-		 }	
-		
-		//remove preflix
-		header=header.replace(SecurityConfiguration.jwtTokenPreflix, "");
-		
-		
-		JWT.require(Algorithm.HMAC512(SecurityConfiguration.hashTokenPassword))
-        .build()
-        .verify(header);
-      DecodedJWT jwt=JWT.decode(header);
-      String sub=jwt.getSubject();
-      Boolean active=jwt.getClaim(SecurityConfiguration.userIsActiveClaimName).asBoolean();
-      String userID= jwt.getClaim(SecurityConfiguration.userIdClaimName).asString();
-      Long logId=jwt.getClaim(SecurityConfiguration.loginIdClaimName).asLong();
-      if(logId==null||sub==null||active==null||userID==null) {
-		Log4j2.log.warn(Log4j2.LogMarker.Security.getMarker(),"UnSupportedJwtException, token do not contain appropriate claim");
-    	throw new UnsupportedJwtException(null);
-
-      }
-      try {
-    	  Integer.parseInt(sub);
-      }
-      catch(NumberFormatException e) {
-    	  Log4j2.log.warn(Log4j2.LogMarker.Security.getMarker(),"UnSupportedJwtException, token do not contain appropriate claim");
-      	throw new UnsupportedJwtException(null);
- 
-      }
-		Log4j2.log.debug(Log4j2.LogMarker.Security.getMarker(),"Verification of token was sucesfull");
-
-      return jwt;
 	}
-
-	@Component
-	public static class justEmptyClassForInterface implements JwtTokenInterface{
-		
-	}
+	
 }
-

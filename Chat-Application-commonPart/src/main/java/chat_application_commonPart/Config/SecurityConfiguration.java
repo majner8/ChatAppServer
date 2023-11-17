@@ -13,6 +13,7 @@ public class SecurityConfiguration {
 	public static final String 	userIdClaimName="userId";
 	public static final String hashTokenPassword="dsaewaas";
 	
+	public static final String userEntityClaimName="";
 	//each login has own id
 	public static final String loginIdClaimName="LoginId";
 	

@@ -14,6 +14,8 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.DynamicUpdate;
 
+import database.User.UserEntity;
+
 
 
 @Entity(name=UserEntity.userEntityName)

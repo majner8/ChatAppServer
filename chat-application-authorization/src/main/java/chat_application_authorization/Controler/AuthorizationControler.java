@@ -30,17 +30,17 @@ import chat_application_authorization.jwt.JwtTokenInterface;
 import chat_application_commonPart.Authorization.CustomUserDetails;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Logger.Log4j2;
-import chat_application_commonPart.PathProperties.AuthorizationPath;
 import chat_application_commonPart.Properties.AuthorizationProperties;
 import chat_application_commonPart.Validation.AutorizationRequestDTOValidator;
 import chat_application_commonPart.Validation.ChangeUserDetailsRequestValidator;
+import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 import chat_application_database.AuthorizationEntity.DeviceIdEntity;
 import chat_application_database.AuthorizationEntity.DeviceIdEntityRepositoryInterface;
 import chat_application_database.AuthorizationEntity.Htpp_Request_Login_Entity;
 import chat_application_database.AuthorizationEntity.LoginActivityEntityInterface;
-import chat_application_database.AuthorizationEntity.UserEntity;
 import chat_application_database.AuthorizationEntity.UserRepositoryInterface;
 import chat_application_database.AuthorizationEntity.UserRepositoryInterface.UserFinishAuthorization;
+import database.User.UserEntity;
 
 @RestController
 @Validated
@@ -77,12 +77,9 @@ public class AuthorizationControler {
 			HttpServletRequest request,
 			@RequestAttribute Htpp_Request_Login_Entity HttpRequestAttribute
 			){
-		
-		
 		if(this.userRepo.existsByEmailOrPhoneAndCountryPreflix(value.getEmail(), value.getPhone(), value.getCountryPreflix())) {
 			Log4j2.log.info(this.marker,String.format("Registration was not successful, email or phone has been already registred."
 					+ System.lineSeparator()+" email %s phone_preflix %s phone %s ", value.getEmail(),value.getCountryPreflix(),value.getPhone()));
-	
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}	
 		

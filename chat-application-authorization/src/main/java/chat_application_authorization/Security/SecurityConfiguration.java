@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import chat_application_commonPart.Logger.Log4j2;
-import chat_application_commonPart.PathProperties.AuthorizationPath;
+import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 
 @EnableWebSecurity
 @Configuration
