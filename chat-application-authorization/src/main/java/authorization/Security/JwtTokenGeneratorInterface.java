@@ -1,4 +1,4 @@
-package chat_application_authorization.jwt;
+package authorization.Security;
 
 import java.time.Duration;
 import java.time.ZoneOffset;
@@ -11,19 +11,21 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import AuthorizationDTO.TokenDTO;
+import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Config.SecurityConfiguration;
 import database.User.UserEntity;
 
-public interface JwtTokenInterface {
+public interface JwtTokenGeneratorInterface {
 
 
 	default TokenDTO generateAuthorizationToken(
-			Duration tokenDuration,
+			DurationService durationService,
 			String deviceID,
 			UserEntity userEntity) {
 		Calendar validUntil=Calendar.getInstance();
 		validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 		validUntil.setTime(new Date());
+		Duration tokenDuration=durationService.getUserAuthorizationToken();
 		int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
 
 		validUntil.add(Calendar.MINUTE, minute);
@@ -50,52 +52,6 @@ public interface JwtTokenInterface {
 
 		TokenDTO token=new TokenDTO();
 		token.setUserActive(userEntity.isUserActive());
-		token.setValidUntil(validUntil.getTime());
-		token.setToken(jwtToken);
-		return token;
-	}
-
-	default TokenDTO generateAuthorizationTokens(
-			Duration tokenDuration,long userID,
-			String deviceID,
-			boolean isUserActive,
-			//just for non activce user
-			UserEntity userEntity,
-			//not necessary, because activity is managed during WebSocket lifecycle 
-			//long loginId,
-			//verison using during password setting e.t.c
-			//when user change password or any security dat
-			//new token have to be generated
-			long version) {
-		Calendar validUntil=Calendar.getInstance();
-		validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
-		validUntil.setTime(new Date());
-		int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
-
-		validUntil.add(Calendar.MINUTE, minute);
-		validUntil.add(Calendar.SECOND, (int)(tokenDuration.getSeconds()-minute*60));
-
-		JWTCreator.Builder jwtBuilder= 
-				JWT.create()
-				.withSubject(String.valueOf(userID))
-				.withIssuedAt(new Date())
-				.withClaim(SecurityConfiguration.DeviceIdClaimName, deviceID)
-				.withClaim(SecurityConfiguration.VersionClaimName,version)
-				.withClaim(SecurityConfiguration.userIsActiveClaimName, isUserActive)
-				
-				.withExpiresAt(validUntil.getTime());
-
-		if(!isUserActive) {
-			//add userEntity to finish registration
-			//user Entity is just as map
-			jwtBuilder.withClaim(SecurityConfiguration.userEntityClaimName,userEntity.getValues());
-		}
-		String jwtToken=jwtBuilder		
-				.sign(Algorithm.HMAC512
-				(SecurityConfiguration.hashTokenPassword));
-
-		TokenDTO token=new TokenDTO();
-		token.setUserActive(isUserActive);
 		token.setValidUntil(validUntil.getTime());
 		token.setToken(jwtToken);
 		return token;

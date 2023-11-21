@@ -5,7 +5,7 @@ import java.time.Duration;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Durations {
+public class DurationService {
 
 	private final Duration deviceToken;
 	

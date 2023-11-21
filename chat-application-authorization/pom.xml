@@ -20,5 +20,10 @@
   	</dependency>
 
 
+  	<dependency>
+  		<groupId>chat-application</groupId>
+  		<artifactId>Chat-Application-commonPart</artifactId>
+  		<version>1</version>
+  	</dependency>
   </dependencies>
 </project>

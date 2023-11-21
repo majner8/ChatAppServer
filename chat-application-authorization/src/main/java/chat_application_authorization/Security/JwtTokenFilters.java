@@ -34,7 +34,7 @@ import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
  * The filter does not verify paths meant for authorization, specifically server login and registration requests.
  */
 @Component
-public class JwtTokenFilter extends OncePerRequestFilter  {
+public class JwtTokenFilters extends OncePerRequestFilter  {
 
 	
 	
