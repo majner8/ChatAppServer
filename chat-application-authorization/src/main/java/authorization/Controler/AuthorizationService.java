@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import User.UserProfileDTO.UserProfileRegistrationDTO;
+import authorization.RequestScopeAuthorizationValue;
 import chat_application_DTO.UserDTO.UserAuthPasswordDTO;
 import chat_application_DTO.UserDTO.UserComunicationDTO;
 import chat_application_commonPart.Logger.Log4j2;
@@ -23,7 +24,7 @@ import database.User.UserEntity;
 import database.User.UserEntityRepository;
 
 @Service
-public class AuthorizationService implements ThreadLocalManipulation{
+public class AuthorizationService{
 	@Autowired
 	private UserEntityRepository userEntityRepo;
 	@Autowired
@@ -31,11 +32,12 @@ public class AuthorizationService implements ThreadLocalManipulation{
 	@Autowired
 	private BCryptPasswordEncoder BCryptEncoder;
 
+	@Autowired
+	private RequestScopeAuthorizationValue thredLocal;
 	
-	private ThreadLocal<UserEntity> threadLocal=new ThreadLocal<UserEntity>();
+//	private ThreadLocal<UserEntity> threadLocal=new ThreadLocal<UserEntity>();
 
 	public AuthorizationService() {
-		ThreadLocalService.addThreadLocal(this);
 	}
 	/**Metod verify if user exist in database and return appropriate boolen value
 	 * @param processLoginRequest- if value is true metod does not call metod existsBy..
@@ -47,7 +49,7 @@ public class AuthorizationService implements ThreadLocalManipulation{
 		if(opt.isEmpty()) {
 			return false;
 		}
-		this.threadLocal.set(opt.get());
+		this.thredLocal.setUserEntity(opt.get());
 		return true;
 
 	
@@ -59,8 +61,8 @@ public class AuthorizationService implements ThreadLocalManipulation{
 		userEnt.setEmail(user.getEmail());
 		userEnt.setPhone(user.getPhone());
 		userEnt.setCountryPreflix(user.getPhonePreflix());
-		this.userEntityRepo.save(userEnt);		
-		this.threadLocal.set(userEnt);
+		this.userEntityRepo.save(userEnt);	
+		this.thredLocal.setUserEntity(userEnt);
 		UserAuthEntity autUser=new UserAuthEntity();
 		autUser.setUserId(userEnt.getUserId());
 		autUser.setPassword(this.BCryptEncoder.encode(password.getPassword()));
@@ -70,7 +72,7 @@ public class AuthorizationService implements ThreadLocalManipulation{
 	
 	/**Metod compare sent password and saved password in database */
 	public boolean login(UserAuthPasswordDTO password) {
-		long userID=this.getSavedThreadLocalUserEntity().getUserId();
+		long userID=this.thredLocal.getUserEntity().getUserId();
 		Optional <UserAuthEntity> user=this.passwordRepo.findById(userID);
 			if(user.isEmpty()) {
 				throw new NullPointerException("user id: "+userID+" was not found in password database");
@@ -85,10 +87,6 @@ public class AuthorizationService implements ThreadLocalManipulation{
 		databaseUser.setBornDate(user.getUserBorn());
 		this.userEntityRepo.saveAndFlush(databaseUser);
 		
-	}
-	/**Metod return saved UserEntity, or null if has not been set before */
-	public UserEntity getSavedThreadLocalUserEntity() {
-		return this.threadLocal.get();
 	}
 	
 

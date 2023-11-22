@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import AuthorizationDTO.TokenDTO;
 import User.UserProfileDTO.UserProfileRegistrationDTO;
+import authorization.RequestScopeAuthorizationValue;
 import authorization.Security.jwtToken;
 import chat_application_DTO.UserDTO.UserAuthorizationDTO;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
@@ -36,6 +37,8 @@ public class AuthorizationControler {
 	@Autowired
 	private AuthorizationService autorizationService;
 	
+	@Autowired
+	private RequestScopeAuthorizationValue thredLocal;
 	/**Metod reuturn device ID token, have to be send with every request */
 	@GetMapping(AuthorizationPath.deviceIdPath)
 	public ResponseEntity<String> getDeviceIDToken(HttpServletRequest request){
@@ -67,8 +70,7 @@ public class AuthorizationControler {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}
 		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User was registred");
-		UserEntity ent=this.autorizationService.getSavedThreadLocalUserEntity();
-		
+		UserEntity ent=this.thredLocal.getUserEntity();
 		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
 		
 		return ResponseEntity.ok(token);
@@ -88,7 +90,7 @@ public class AuthorizationControler {
 			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone or password were incorecct");
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		UserEntity ent=this.autorizationService.getSavedThreadLocalUserEntity();
+		UserEntity ent=this.thredLocal.getUserEntity();
 		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
 		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),
 				"Login was sucesfull");
