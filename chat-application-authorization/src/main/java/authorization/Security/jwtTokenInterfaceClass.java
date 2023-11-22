@@ -18,7 +18,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import AuthorizationDTO.TokenDTO;
 import authorization.Security.jwtToken.jwtTokenValidationInterface;
-import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Config.SecurityConfiguration;
 import chat_application_common_Part.Security.SecurityProperties;
 import database.User.UserEntity;
@@ -29,11 +28,10 @@ public class jwtTokenInterfaceClass {
 	
 	@Component
 	public static class jwtTokenValidationClass implements jwtTokenValidationInterface{
+		
+		
 		@Autowired
 		private SecurityProperties securityProperties;
-
-		
-		
 		
 		private DecodedJWT verifyToken(String headerName, String tokenPreflix, HttpServletRequest request
 				,Algorithm tokenAlgo) {
@@ -56,17 +54,18 @@ public class jwtTokenInterfaceClass {
 
 
 		@Override
-		public void jwtTokenDeviceIDTokenValidator(HttpServletRequest request) {
+		public DecodedJWT jwtTokenDeviceIDTokenValidator(HttpServletRequest request) {
 			// TODO Auto-generated method stub
-			DecodedJWT token=this.verifyToken(this.securityProperties.getTokenDeviceIdHeaderName(), 
+			return this.verifyToken(this.securityProperties.getTokenDeviceIdHeaderName(), 
 					this.securityProperties.getTokenDeviceIdPreflix(), request, 
 					this.securityProperties.getjwtTokenDeviceIDAlgorithm());
+			
 		}
 
 		@Override
-		public void jwtTokenAuthorizationUserTokenValidator(HttpServletRequest request) {
+		public DecodedJWT jwtTokenAuthorizationUserTokenValidator(HttpServletRequest request) {
 			// TODO Auto-generated method stub
-			DecodedJWT token=this.verifyToken(this.securityProperties.getTokenAuthorizationUserHederName(), 
+			return this.verifyToken(this.securityProperties.getTokenAuthorizationUserHederName(), 
 					this.securityProperties.getTokenAuthorizationUserPreflix(), request, 
 					this.securityProperties.getjwtTokenAuthorizationUserAlgorithm());
 		

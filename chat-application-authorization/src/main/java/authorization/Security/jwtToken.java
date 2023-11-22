@@ -37,9 +37,9 @@ public interface jwtToken {
 			}
 	public static interface jwtTokenValidationInterface{
 		
-		public void jwtTokenDeviceIDTokenValidator(HttpServletRequest request);
+		public DecodedJWT jwtTokenDeviceIDTokenValidator(HttpServletRequest request);
 		
-		public void jwtTokenAuthorizationUserTokenValidator(HttpServletRequest request);
+		public DecodedJWT jwtTokenAuthorizationUserTokenValidator(HttpServletRequest request);
 		}
 	
 }

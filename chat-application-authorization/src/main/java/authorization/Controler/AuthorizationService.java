@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import User.UserProfileDTO.UserProfileRegistrationDTO;
-import authorization.RequestScopeAuthorizationValue;
 import chat_application_DTO.UserDTO.UserAuthPasswordDTO;
 import chat_application_DTO.UserDTO.UserComunicationDTO;
 import chat_application_commonPart.Logger.Log4j2;
@@ -32,8 +31,6 @@ public class AuthorizationService{
 	@Autowired
 	private BCryptPasswordEncoder BCryptEncoder;
 
-	@Autowired
-	private RequestScopeAuthorizationValue thredLocal;
 	
 //	private ThreadLocal<UserEntity> threadLocal=new ThreadLocal<UserEntity>();
 
@@ -43,26 +40,28 @@ public class AuthorizationService{
 	 * @param processLoginRequest- if value is true metod does not call metod existsBy..
 	 * Instead, it call metod findBy... and save returned value to threadLocalValue, if returned Optional would be empty
 	 * metod return false */
-	public boolean doesUserExist(UserComunicationDTO user,boolean processLoginRequest) {
+	public boolean doesUserExist(UserComunicationDTO user,boolean processLoginRequest,
+			ThreadLocal<UserEntity>userEntity) {
 		if(!processLoginRequest)return this.userEntityRepo.existsByEmailOrPhoneAndCountryPreflix(user.getEmail(),user.getPhone(),user.getPhonePreflix());
 		Optional<UserEntity> opt=this.userEntityRepo.findByEmailOrPhoneAndCountryPreflix(user.getEmail(), user.getPhone(), user.getPhonePreflix());
 		if(opt.isEmpty()) {
 			return false;
 		}
-		this.thredLocal.setUserEntity(opt.get());
+		userEntity.set(opt.get());
 		return true;
 
 	
 	}
 	@Transactional
-	public void register(UserComunicationDTO user,UserAuthPasswordDTO password) {
+	public void register(UserComunicationDTO user,UserAuthPasswordDTO password,
+			ThreadLocal<UserEntity>userEntity) {
 		
 		UserEntity userEnt=new UserEntity();
 		userEnt.setEmail(user.getEmail());
 		userEnt.setPhone(user.getPhone());
 		userEnt.setCountryPreflix(user.getPhonePreflix());
 		this.userEntityRepo.save(userEnt);	
-		this.thredLocal.setUserEntity(userEnt);
+		userEntity.set(userEnt);
 		UserAuthEntity autUser=new UserAuthEntity();
 		autUser.setUserId(userEnt.getUserId());
 		autUser.setPassword(this.BCryptEncoder.encode(password.getPassword()));
@@ -71,8 +70,8 @@ public class AuthorizationService{
 	}
 	
 	/**Metod compare sent password and saved password in database */
-	public boolean login(UserAuthPasswordDTO password) {
-		long userID=this.thredLocal.getUserEntity().getUserId();
+	public boolean login(UserAuthPasswordDTO password,ThreadLocal<UserEntity>userEntity) {
+		long userID=userEntity.get().getUserId();
 		Optional <UserAuthEntity> user=this.passwordRepo.findById(userID);
 			if(user.isEmpty()) {
 				throw new NullPointerException("user id: "+userID+" was not found in password database");

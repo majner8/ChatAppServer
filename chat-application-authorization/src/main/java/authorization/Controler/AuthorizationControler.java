@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import AuthorizationDTO.TokenDTO;
 import User.UserProfileDTO.UserProfileRegistrationDTO;
-import authorization.RequestScopeAuthorizationValue;
 import authorization.Security.jwtToken;
 import chat_application_DTO.UserDTO.UserAuthorizationDTO;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
+import chat_application_common_Part.Security.DeviceIDRequestScope;
 import database.Authorization.deviceIdGenerationRepository;
 import database.User.UserAuthEntityRepository;
 import database.User.UserEntity;
@@ -38,7 +38,9 @@ public class AuthorizationControler {
 	private AuthorizationService autorizationService;
 	
 	@Autowired
-	private RequestScopeAuthorizationValue thredLocal;
+	private DeviceIDRequestScope requestScopeValue;
+	
+	private ThreadLocal<UserEntity>userEntity;
 	/**Metod reuturn device ID token, have to be send with every request */
 	@GetMapping(AuthorizationPath.deviceIdPath)
 	public ResponseEntity<String> getDeviceIDToken(HttpServletRequest request){
@@ -51,8 +53,7 @@ public class AuthorizationControler {
 	}
 	
 	public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserAuthorizationDTO 
-			userData,
-			@RequestAttribute String deviceID){
+			userData){
 		
 		if(this.autorizationService.doesUserExist(userData.getProfile(),false)) {
 			//userExist
@@ -70,7 +71,7 @@ public class AuthorizationControler {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}
 		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User was registred");
-		UserEntity ent=this.thredLocal.getUserEntity();
+		UserEntity ent=this.requestScopeValue.getUserEntity();
 		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
 		
 		return ResponseEntity.ok(token);
@@ -78,8 +79,7 @@ public class AuthorizationControler {
 	}
 	
 	public ResponseEntity<TokenDTO> login(@RequestBody @Valid UserAuthorizationDTO 
-			userData,
-			@RequestAttribute String deviceID){
+			userData){
 		if(!this.autorizationService.doesUserExist(userData.getProfile(), true)) {
 			//email/phone has been registred
 			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone were incorecct, user was not found");
@@ -90,19 +90,17 @@ public class AuthorizationControler {
 			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone or password were incorecct");
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		UserEntity ent=this.thredLocal.getUserEntity();
+		UserEntity ent=this.requestScopeValue.getUserEntity();
 		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
 		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),
 				"Login was sucesfull");
 		return ResponseEntity.ok(token);
 		
 	}
-	public ResponseEntity<TokenDTO>finishRegistration(@RequestBody @Valid UserProfileRegistrationDTO user,
-			@RequestAttribute UserEntity userEnt,
-			@RequestAttribute String deviceID){
+	public ResponseEntity<TokenDTO>finishRegistration(@RequestBody @Valid UserProfileRegistrationDTO user){
 		HttpStatus status;
 		try {
-			this.autorizationService.FinishRegistration(user, userEnt);
+			this.autorizationService.FinishRegistration(user, this.requestScopeValue.getUserEntity());
 			status=HttpStatus.OK;
 			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User finish registration");
 
@@ -115,7 +113,7 @@ public class AuthorizationControler {
 		}
 		Log4j2.log.debug(Log4j2.MarkerLog.Authorization.getMarker(),"I am generating fully authorizated token");
 		TokenDTO token=
-				this.jwtToken.generateAuthorizationToken(deviceID, userEnt);
+				this.jwtToken.generateAuthorizationToken(this.requestScopeValue.getDeviceID(), this.requestScopeValue.getUserEntity());
 		return ResponseEntity.status(status)
 				.body(token);
 		}

@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import authorization.Security.Filter.FilterService.Filter;
 
 public class jwtFilterUserAuthorization extends Filter{
@@ -15,13 +17,12 @@ public class jwtFilterUserAuthorization extends Filter{
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		if(!super.filterService.skipUserAuthorizationFilter(request.getRequestURI())) {
-			//metod validate token and put all information to securityContext
-			super.tokenValidator.jwtTokenAuthorizationUserTokenValidator(request);
-		
+		if(super.filterService.skipUserAuthorizationFilter(request.getRequestURI())) {
+			filterChain.doFilter(request, response);
+			return;
 		}
-		filterChain.doFilter(request, response);
-		return;
+		DecodedJWT token=super.tokenValidator.jwtTokenAuthorizationUserTokenValidator(request);
+	
 	}
 
 }
