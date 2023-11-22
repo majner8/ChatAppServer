@@ -18,128 +18,29 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import AuthorizationDTO.TokenDTO;
 import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Config.SecurityConfiguration;
+import chat_application_common_Part.Security.SecurityProperties;
 import database.User.UserEntity;
 import io.jsonwebtoken.UnsupportedJwtException;
 
-public interface jwtToken {
-
-	static final String deviceIdPreflix="";
-	static final String userIdPreflix="";
-	static final String userTokenName="";
-	static final String deviceIdTokenName="";
-
-	
+public interface jwtToken {	
 	public static interface jwtTokenGeneratorInterface {
 
-
-		default TokenDTO generateAuthorizationToken(
-				DurationService durationService,
+		public TokenDTO generateAuthorizationToken(
 				String deviceID,
-				UserEntity userEntity) {
-			Calendar validUntil=Calendar.getInstance();
-			validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
-			validUntil.setTime(new Date());
-			Duration tokenDuration=durationService.getUserAuthorizationToken();
-			int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
-
-			validUntil.add(Calendar.MINUTE, minute);
-			validUntil.add(Calendar.SECOND, (int)(tokenDuration.getSeconds()-minute*60));
-
-			JWTCreator.Builder jwtBuilder= 
-					JWT.create()
-					.withSubject(String.valueOf(userEntity.getUserId()))
-					.withIssuedAt(new Date())
-					.withClaim(SecurityConfiguration.DeviceIdClaimName, deviceID)
-					.withClaim(SecurityConfiguration.VersionClaimName,userEntity.getVersion())
-					.withClaim(SecurityConfiguration.userIsActiveClaimName, userEntity.isUserActive())
-					
-					.withExpiresAt(validUntil.getTime());
-
-			if(!userEntity.isUserActive()) {
-				//add userEntity to finish registration
-				//user Entity is just as map
-				jwtBuilder.withClaim(SecurityConfiguration.userEntityClaimName,userEntity.getValues());
-			}
-			String jwtToken=jwtBuilder		
-					.sign(Algorithm.HMAC512
-					(SecurityConfiguration.hashTokenPassword));
-
-			TokenDTO token=new TokenDTO();
-			token.setUserActive(userEntity.isUserActive());
-			token.setValidUntil(validUntil.getTime());
-			token.setToken(jwtToken);
-			return token;
-		}
+				UserEntity userEntity);
+		
 		/**Metod generate sign device token.
 		 * @return sign token, with preflix
 		 *  */
-		default String generateDeviceToken(Duration tokenDuration,
-				String deviceID) {
-			Calendar validUntil=Calendar.getInstance();
-			validUntil.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
-			validUntil.setTime(new Date());
-			int minute=(int)Math.floor(tokenDuration.getSeconds()/60);
-
-			validUntil.add(Calendar.MINUTE, minute);
-			validUntil.add(Calendar.SECOND, (int)(tokenDuration.getSeconds()-minute*60));
-
-			return JWT.create()
-					.withSubject(deviceID)
-					.withIssuedAt(new Date())
-					.withExpiresAt(validUntil.getTime())
-					.sign(Algorithm.HMAC512(SecurityConfiguration.hashTokenPassword));
-		
-		}
-		
-	}
+		public String generateDeviceToken(
+				String deviceID);
+			}
 	public static interface jwtTokenValidationInterface{
 		
-		default void deviceIdjwtFilterValidator(HttpServletRequest request) {
-			DecodedJWT token=this.verifyToken(jwtToken.deviceIdTokenName, jwtToken.deviceIdPreflix, request);
-
-		}
+		public void deviceIdjwtFilterValidator(HttpServletRequest request);
 		
-		default void userIdjwtFilterValidator(HttpServletRequest request) {
-			DecodedJWT token=this.verifyToken(jwtToken.userTokenName, jwtToken.userIdPreflix, request);
-			
+		public void userIdjwtFilterValidator(HttpServletRequest request);
 		}
-		
-		public DecodedJWT verifyToken(String headerName,String tokenPreflix,HttpServletRequest request);
-		@Component
-		public static class jwtTokenValidationClass implements jwtTokenValidationInterface{
-
-			@Override
-			public DecodedJWT verifyToken(String headerName, String tokenPreflix, HttpServletRequest request) {
-				// TODO Auto-generated method stub
-				String rawToken=request.getHeader(headerName);
-				if(rawToken==null) {
-					throw new UnsupportedJwtException(null);
-				}
-				if(!rawToken.startsWith(tokenPreflix)) {
-					throw new UnsupportedJwtException(null);
-				}
-				rawToken=rawToken.replaceFirst(tokenPreflix, "");
-				return null;
-				/*
-				 JWT.require(Algorithm.HMAC512(this.SecretKey))
-				 .build()
-				 .verify(token);
-				DecodedJWT jwt=JWT.decode(token);
-				String sub=jwt.getSubject();
-				String active=jwt.getClaim(SecurityConfiguration.userIsActiveClaimName).asString();
-				String userID= jwt.getClaim(SecurityConfiguration.userIdClaimName).asString();
-				if(sub==null||active==null||userID==null) {
-					throw new UnsupportedJwtException(null);
-				}
-				return jwt;
-				*/
-			
-			}
-			
-			
-			
-		}
-	}
 	
 }
 
