@@ -56,7 +56,7 @@ public class jwtTokenInterfaceClass {
 
 
 		@Override
-		public void deviceIdjwtFilterValidator(HttpServletRequest request) {
+		public void jwtTokenDeviceIDTokenValidator(HttpServletRequest request) {
 			// TODO Auto-generated method stub
 			DecodedJWT token=this.verifyToken(this.securityProperties.getTokenDeviceIdHeaderName(), 
 					this.securityProperties.getTokenDeviceIdPreflix(), request, 
@@ -64,13 +64,17 @@ public class jwtTokenInterfaceClass {
 		}
 
 		@Override
-		public void userIdjwtFilterValidator(HttpServletRequest request) {
+		public void jwtTokenAuthorizationUserTokenValidator(HttpServletRequest request) {
 			// TODO Auto-generated method stub
 			DecodedJWT token=this.verifyToken(this.securityProperties.getTokenAuthorizationUserHederName(), 
 					this.securityProperties.getTokenAuthorizationUserPreflix(), request, 
 					this.securityProperties.getjwtTokenAuthorizationUserAlgorithm());
 		
 		}
+
+
+
+
 		
 		
 		

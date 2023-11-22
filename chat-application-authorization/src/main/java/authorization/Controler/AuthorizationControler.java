@@ -34,18 +34,15 @@ public class AuthorizationControler {
 	@Autowired
 	private deviceIdGenerationRepository IdGeneration;
 	@Autowired
-	private HttpServletRequestInetAdress inetAdress;
-	@Autowired
 	private AuthorizationService autorizationService;
-	@Autowired
-	private DurationService duration;
 	
 	/**Metod reuturn device ID token, have to be send with every request */
 	@GetMapping(AuthorizationPath.deviceIdPath)
 	public ResponseEntity<String> getDeviceIDToken(HttpServletRequest request){
 		String id=this.IdGeneration.deviceIdGeneration();
-		String token=this.jwtToken.generateDeviceToken(this.duration.getDeviceToken(),id);
 		
+		String token=this.jwtToken.generateDeviceToken(id);
+						
 		return ResponseEntity.ok(token);
 		
 	}
@@ -72,7 +69,7 @@ public class AuthorizationControler {
 		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User was registred");
 		UserEntity ent=this.autorizationService.getSavedThreadLocalUserEntity();
 		
-		TokenDTO token=this.jwtToken.generateAuthorizationToken(this.duration, deviceID, ent);
+		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
 		
 		return ResponseEntity.ok(token);
 		
@@ -92,7 +89,7 @@ public class AuthorizationControler {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		UserEntity ent=this.autorizationService.getSavedThreadLocalUserEntity();
-		TokenDTO token=this.jwtToken.generateAuthorizationToken(duration, deviceID, ent);
+		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
 		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),
 				"Login was sucesfull");
 		return ResponseEntity.ok(token);
@@ -116,7 +113,7 @@ public class AuthorizationControler {
 		}
 		Log4j2.log.debug(Log4j2.MarkerLog.Authorization.getMarker(),"I am generating fully authorizated token");
 		TokenDTO token=
-				this.jwtToken.generateAuthorizationToken(duration, deviceID, userEnt);
+				this.jwtToken.generateAuthorizationToken(deviceID, userEnt);
 		return ResponseEntity.status(status)
 				.body(token);
 		}

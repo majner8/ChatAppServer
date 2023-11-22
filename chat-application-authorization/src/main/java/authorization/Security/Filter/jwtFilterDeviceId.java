@@ -16,7 +16,7 @@ public class jwtFilterDeviceId extends Filter {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		if(!super.filterService.skipDeviceIdFilter(request.getRequestURI())) {
-			super.tokenValidator.deviceIdjwtFilterValidator(request);
+			super.tokenValidator.jwtTokenDeviceIDTokenValidator(request);
 
 		}
 		filterChain.doFilter(request, response);

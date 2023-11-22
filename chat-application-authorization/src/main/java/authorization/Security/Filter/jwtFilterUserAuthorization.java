@@ -17,7 +17,7 @@ public class jwtFilterUserAuthorization extends Filter{
 		// TODO Auto-generated method stub
 		if(!super.filterService.skipUserAuthorizationFilter(request.getRequestURI())) {
 			//metod validate token and put all information to securityContext
-			super.tokenValidator.userIdjwtFilterValidator(request);
+			super.tokenValidator.jwtTokenAuthorizationUserTokenValidator(request);
 		
 		}
 		filterChain.doFilter(request, response);
