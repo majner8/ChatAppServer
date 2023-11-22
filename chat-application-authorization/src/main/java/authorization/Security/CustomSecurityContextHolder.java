@@ -34,7 +34,7 @@ public class CustomSecurityContextHolder implements SecurityContextHolderStrateg
 
 	public static class CustomSecurityContext implements SecurityContext{
 		private Authentication aut;
-		
+		//other deviceId information
 		@Override
 		public Authentication getAuthentication() {
 			// TODO Auto-generated method stub

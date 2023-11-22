@@ -7,8 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.security.core.context.SecurityContextHolder;
-
 import authorization.Security.Filter.FilterService.Filter;
 
 public class jwtFilterDeviceId extends Filter {
@@ -17,14 +15,12 @@ public class jwtFilterDeviceId extends Filter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		if(super.filterService.skipDeviceIdFilter(request.getRequestURI())) {
-			filterChain.doFilter(request, response);
-			return;
+		if(!super.filterService.skipDeviceIdFilter(request.getRequestURI())) {
+			super.tokenValidator.deviceIdjwtFilterValidator(request);
+
 		}
-		
-		super.tokenValidator.deviceIdjwtFilterValidator(request);
-		SecurityContextHolder.getContext().
-		
+		filterChain.doFilter(request, response);
+		return;
 	}
 
 }

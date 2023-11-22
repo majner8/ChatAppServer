@@ -8,6 +8,8 @@ import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.stereotype.Component;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -92,13 +94,53 @@ public interface jwtToken {
 	}
 	public static interface jwtTokenValidationInterface{
 		
-		default DecodedJWT deviceIdjwtFilterValidator(HttpServletRequest request) {
-			String rawToken=request.getHeader(jwtToken.deviceIdTokenName);
-			if(rawToken==null) {
-				throw new UnsupportedJwtException(null);
-			}
+		default void deviceIdjwtFilterValidator(HttpServletRequest request) {
+			DecodedJWT token=this.verifyToken(jwtToken.deviceIdTokenName, jwtToken.deviceIdPreflix, request);
+
 		}
 		
+		default void userIdjwtFilterValidator(HttpServletRequest request) {
+			DecodedJWT token=this.verifyToken(jwtToken.userTokenName, jwtToken.userIdPreflix, request);
+			
+		}
+		
+		public DecodedJWT verifyToken(String headerName,String tokenPreflix,HttpServletRequest request);
+		@Component
+		public static class jwtTokenValidationClass implements jwtTokenValidationInterface{
+
+			@Override
+			public DecodedJWT verifyToken(String headerName, String tokenPreflix, HttpServletRequest request) {
+				// TODO Auto-generated method stub
+				String rawToken=request.getHeader(headerName);
+				if(rawToken==null) {
+					throw new UnsupportedJwtException(null);
+				}
+				if(!rawToken.startsWith(tokenPreflix)) {
+					throw new UnsupportedJwtException(null);
+				}
+				rawToken=rawToken.replaceFirst(tokenPreflix, "");
+				return null;
+				/*
+				 JWT.require(Algorithm.HMAC512(this.SecretKey))
+				 .build()
+				 .verify(token);
+				DecodedJWT jwt=JWT.decode(token);
+				String sub=jwt.getSubject();
+				String active=jwt.getClaim(SecurityConfiguration.userIsActiveClaimName).asString();
+				String userID= jwt.getClaim(SecurityConfiguration.userIdClaimName).asString();
+				if(sub==null||active==null||userID==null) {
+					throw new UnsupportedJwtException(null);
+				}
+				return jwt;
+				*/
+			
+			}
+			
+			
+			
+		}
 	}
 	
 }
+
+
