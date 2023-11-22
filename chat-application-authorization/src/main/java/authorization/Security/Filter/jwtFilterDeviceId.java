@@ -16,8 +16,6 @@ import authorization.Security.Filter.FilterService.Filter;
 @Component
 public class jwtFilterDeviceId extends Filter {
 
-	@Autowired
-	private RequestScopeAuthorizationValue scopeValue;
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import AuthorizationDTO.TokenDTO;
 import User.UserProfileDTO.UserProfileRegistrationDTO;
+import authorization.RequestScope_UserEntity;
 import authorization.Security.jwtToken;
 import chat_application_DTO.UserDTO.UserAuthorizationDTO;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
@@ -39,8 +40,9 @@ public class AuthorizationControler {
 	
 	@Autowired
 	private DeviceIDRequestScope requestScopeValue;
+	@Autowired
+	private RequestScope_UserEntity userEntity;
 	
-	private ThreadLocal<UserEntity>userEntity;
 	/**Metod reuturn device ID token, have to be send with every request */
 	@GetMapping(AuthorizationPath.deviceIdPath)
 	public ResponseEntity<String> getDeviceIDToken(HttpServletRequest request){
