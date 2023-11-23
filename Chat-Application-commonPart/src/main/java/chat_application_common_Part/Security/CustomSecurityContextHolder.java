@@ -75,6 +75,9 @@ public class CustomSecurityContextHolder implements SecurityContextHolderStrateg
 		public long getUserID() {
 			return ((CustomUserDetails)this.aut.getPrincipal()).getUserID();
 		}
+		public CustomUserDetails getCustomUserDetails() {
+			return (CustomUserDetails)this.aut.getPrincipal();
+		}
 	}
 	
 }

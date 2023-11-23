@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.HandlerInterceptor;
-
+//for saving login information
 public class RequestInterceptor implements HandlerInterceptor {
 
 

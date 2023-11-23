@@ -2,6 +2,7 @@ package authorization.Controler;
 
 import java.util.Optional;
 
+import javax.persistence.OptimisticLockException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import User.UserProfileDTO.UserProfileRegistrationDTO;
 import authorization.Authorization_RequestScope_UserEntity;
 import chat_application_DTO.UserDTO.UserAuthPasswordDTO;
 import chat_application_DTO.UserDTO.UserComunicationDTO;
+import chat_application_common_Part.Security.CustomSecurityContextHolder;
 import database.Exception.UserWasNotFoundInDatabaseException;
 import database.User.UserAuthEntity;
 import database.User.UserAuthEntityRepository;
@@ -77,28 +79,25 @@ public class AuthorizationService{
 		@Autowired
 		private UserEntityRepository userEntityRepo;
 		@Autowired
-		private UserAuthEntityRepository passwordRepo;
-		@Autowired
-		private BCryptPasswordEncoder BCryptEncoder;
-		@Autowired
 		private Authorization_RequestScope_UserEntity RequestUserEntity;
 		
 
 		public void FinishRegistration(UserProfileRegistrationDTO user,long userID) throws UserWasNotFoundInDatabaseException {
 			UserEntity databaseUser=this.userEntityRepo.findById(userID).orElseThrow(UserWasNotFoundInDatabaseException::new);
+			long previousDatabaseVersion=CustomSecurityContextHolder.getCustomSecurityContext().getCustomUserDetails().getDatabaseVersion();
+			if(previousDatabaseVersion!=databaseUser.getVersion()) {
+				throw new OptimisticLockException();
+			}
 			databaseUser.setNick(user.getNickName());
 			databaseUser.setSerName(user.getSerName());
 			databaseUser.setLastName(user.getLastName());
 			databaseUser.setBornDate(user.getUserBorn());
+
 			this.userEntityRepo.saveAndFlush(databaseUser);
+			this.RequestUserEntity.setUserEntity(databaseUser);
 		}
 		
 
-	}
-	
-//	private ThreadLocal<UserEntity> threadLocal=new ThreadLocal<UserEntity>();
-
-	public AuthorizationService() {
 	}
 
 	
