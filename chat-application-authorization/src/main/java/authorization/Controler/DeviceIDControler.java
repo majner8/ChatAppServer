@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import authorization.RequestScope_UserEntity;
+import authorization.Authorization_RequestScope_UserEntity;
 import authorization.Security.jwtToken;
 import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 import chat_application_common_Part.Security.DeviceIDRequestScope;
@@ -23,7 +23,7 @@ public class DeviceIDControler {
 	@Autowired
 	private DeviceIDRequestScope requestScopeValue;
 	@Autowired
-	private RequestScope_UserEntity userEntity;
+	private Authorization_RequestScope_UserEntity userEntity;
 	
 	
 	

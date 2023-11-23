@@ -70,7 +70,11 @@ public class CustomSecurityContextHolder implements SecurityContextHolderStrateg
 		public void setDeviceID(String deviceID) {
 			this.deviceID = deviceID;
 		}
-		
+		//principal have to be CustomUserDetails
+		//will be verify during conctruction
+		public long getUserID() {
+			return ((CustomUserDetails)this.aut.getPrincipal()).getUserID();
+		}
 	}
 	
 }

@@ -18,8 +18,7 @@ public interface SecurityProperties {
 	
 	public Calendar getJwtTokenDeviceIdDuration();
 	public Calendar getJwtTokenAuthorizationUserDuration();
-
-
+	
 
 	
 }

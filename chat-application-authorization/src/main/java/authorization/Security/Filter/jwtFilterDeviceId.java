@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import authorization.Security.Filter.FilterService.Filter;
+import chat_application_common_Part.Security.CustomSecurityContextHolder;
 @Component
 public class jwtFilterDeviceId extends Filter {
 
@@ -25,7 +26,8 @@ public class jwtFilterDeviceId extends Filter {
 			return;
 		}
 		DecodedJWT token=super.tokenValidator.jwtTokenDeviceIDTokenValidator(request);
-		this.scopeValue.setDeviceID(token.getSubject());
+		//add userID as attribute
+		CustomSecurityContextHolder.getCustomSecurityContext().setDeviceID(token.getSubject());
 		filterChain.doFilter(request, response);
 		return;
 	}

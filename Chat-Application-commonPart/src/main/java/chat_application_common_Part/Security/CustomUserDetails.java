@@ -9,6 +9,11 @@ public class CustomUserDetails implements UserDetails{
 
 	private final long userID;
 	private final long databaseVersion;
+	
+	public CustomUserDetails(long userID,long databaseVersion) {
+		this.userID=userID;
+		this.databaseVersion=databaseVersion;
+	}
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
@@ -49,6 +54,12 @@ public class CustomUserDetails implements UserDetails{
 	public boolean isEnabled() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	public long getUserID() {
+		return this.userID;
+	}
+	public long getDatabaseVersion() {
+		return this.databaseVersion;
 	}
 
 }

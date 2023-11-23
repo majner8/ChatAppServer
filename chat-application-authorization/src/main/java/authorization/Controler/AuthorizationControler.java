@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import AuthorizationDTO.TokenDTO;
 import User.UserProfileDTO.UserProfileRegistrationDTO;
@@ -27,6 +28,7 @@ import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
 import chat_application_common_Part.Security.DeviceIDRequestScope;
 import database.Authorization.deviceIdGenerationRepository;
+import database.Exception.UserWasNotFoundInDatabaseException;
 import database.User.UserAuthEntityRepository;
 import database.User.UserEntity;
 import database.User.UserEntityRepository;
@@ -43,9 +45,8 @@ public class AuthorizationControler {
 		@Autowired
 		private jwtToken.jwtTokenGeneratorInterface jwtToken;
 		public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserAuthorizationDTO 
-				userData,
-				@RequestAttribute String deviceID){
-			
+				userData){
+			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
 			if(this.autorizationService.doesUserExist(userData.getProfile(),false)) {
 				//userExist
 				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Email or Phone has been registred yet");
@@ -69,8 +70,8 @@ public class AuthorizationControler {
 		}
 		
 		public ResponseEntity<TokenDTO> login(@RequestBody @Valid UserAuthorizationDTO 
-				userData,
-				@RequestAttribute String deviceID){
+				userData){
+			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
 			if(!this.autorizationService.doesUserExist(userData.getProfile(), true)) {
 				//email/phone has been registred
 				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone were incorecct, user was not found");
@@ -99,8 +100,10 @@ public class AuthorizationControler {
 		
 		public ResponseEntity<TokenDTO>finishRegistration(@RequestBody @Valid UserProfileRegistrationDTO user){
 			HttpStatus status;
+			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
+			long userID=CustomSecurityContextHolder.getCustomSecurityContext().getUserID();
 			try {
-				this.autorizationService.FinishRegistration(user);
+				this.autorizationService.FinishRegistration(user,userID);
 				status=HttpStatus.OK;
 				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User finish registration");
 
@@ -110,10 +113,13 @@ public class AuthorizationControler {
 				//just inform user
 				status=HttpStatus.CONFLICT;
 				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"FinishRegistratrion task was not sucesfull, registration was finished before");
+			} catch (UserWasNotFoundInDatabaseException e) {
+				Log4j2.log.warn(Log4j2.MarkerLog.Database.getMarker(),"User not found with ID: during finish registeration process");
+	            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: "+userID+System.lineSeparator()
+	            +"Try make register again, if problem persist contact administrator");
 			}
 			
 			Log4j2.log.debug(Log4j2.MarkerLog.Authorization.getMarker(),"I am generating fully authorizated token");
-			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
 			TokenDTO token=
 					this.jwtToken.generateAuthorizationToken(deviceID, this.RequestScopeUserEntity.getUserEntity());
 			return ResponseEntity.status(status)
@@ -122,28 +128,6 @@ public class AuthorizationControler {
 			}
 	}
 	
-	@Autowired
-	private jwtToken.jwtTokenGeneratorInterface jwtToken;
-	@Autowired
-	private deviceIdGenerationRepository IdGeneration;
-	@Autowired
-	private AuthorizationService autorizationService;
-	
-	@Autowired
-	private DeviceIDRequestScope requestScopeValue;
-	@Autowired
-	private RequestScope_UserEntity userEntity;
-	
-	/**Metod reuturn device ID token, have to be send with every request */
-	@GetMapping(AuthorizationPath.deviceIdPath)
-	public ResponseEntity<String> getDeviceIDToken(HttpServletRequest request){
-		String id=this.IdGeneration.deviceIdGeneration();
-		
-		String token=this.jwtToken.generateDeviceToken(id);
-						
-		return ResponseEntity.ok(token);
-		
-	}
 	
 
 }

@@ -22,7 +22,8 @@ import chat_application_common_Part.Security.SecurityProperties;
 import database.User.UserEntity;
 import io.jsonwebtoken.UnsupportedJwtException;
 
-public interface jwtToken {	
+public interface jwtToken {
+	public static final String authoriClainName="Authority";
 	public static interface jwtTokenGeneratorInterface {
 
 		public TokenDTO generateAuthorizationToken(

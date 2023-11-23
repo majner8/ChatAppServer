@@ -5,16 +5,14 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import User.UserProfileDTO.UserProfileRegistrationDTO;
-import authorization.RequestScope_UserEntity;
+import authorization.Authorization_RequestScope_UserEntity;
 import chat_application_DTO.UserDTO.UserAuthPasswordDTO;
 import chat_application_DTO.UserDTO.UserComunicationDTO;
+import database.Exception.UserWasNotFoundInDatabaseException;
 import database.User.UserAuthEntity;
 import database.User.UserAuthEntityRepository;
 import database.User.UserEntity;
@@ -30,7 +28,7 @@ public class AuthorizationService{
 		@Autowired
 		private BCryptPasswordEncoder BCryptEncoder;
 		@Autowired
-		private RequestScope_UserEntity userEntityRequest;
+		private Authorization_RequestScope_UserEntity RequestUserEntity;
 		
 		/**Metod verify if user exist in database and return appropriate boolen value
 		 * @param processLoginRequest- if value is true metod does not call metod existsBy..
@@ -42,7 +40,7 @@ public class AuthorizationService{
 			if(opt.isEmpty()) {
 				return false;
 			}
-			userEntity.set(opt.get());
+			this.RequestUserEntity.setUserEntity(opt.get());
 			return true;
 
 		
@@ -55,7 +53,7 @@ public class AuthorizationService{
 			userEnt.setPhone(user.getPhone());
 			userEnt.setCountryPreflix(user.getPhonePreflix());
 			this.userEntityRepo.save(userEnt);	
-			userEntity.set(userEnt);
+			this.RequestUserEntity.setUserEntity(userEnt);
 			UserAuthEntity autUser=new UserAuthEntity();
 			autUser.setUserId(userEnt.getUserId());
 			autUser.setPassword(this.BCryptEncoder.encode(password.getPassword()));
@@ -65,7 +63,7 @@ public class AuthorizationService{
 		
 		/**Metod compare sent password and saved password in database */
 		public boolean login(UserAuthPasswordDTO password) {
-			long userID=userEntity.get().getUserId();
+			long userID=this.RequestUserEntity.getUserEntity().getUserId();
 			Optional <UserAuthEntity> user=this.passwordRepo.findById(userID);
 				if(user.isEmpty()) {
 					throw new NullPointerException("user id: "+userID+" was not found in password database");
@@ -82,16 +80,20 @@ public class AuthorizationService{
 		private UserAuthEntityRepository passwordRepo;
 		@Autowired
 		private BCryptPasswordEncoder BCryptEncoder;
+		@Autowired
+		private Authorization_RequestScope_UserEntity RequestUserEntity;
+		
 
-
-		public void FinishRegistration(UserProfileRegistrationDTO usery) {
+		public void FinishRegistration(UserProfileRegistrationDTO user,long userID) throws UserWasNotFoundInDatabaseException {
+			UserEntity databaseUser=this.userEntityRepo.findById(userID).orElseThrow(UserWasNotFoundInDatabaseException::new);
 			databaseUser.setNick(user.getNickName());
 			databaseUser.setSerName(user.getSerName());
 			databaseUser.setLastName(user.getLastName());
 			databaseUser.setBornDate(user.getUserBorn());
 			this.userEntityRepo.saveAndFlush(databaseUser);
-			
 		}
+		
+
 	}
 	
 //	private ThreadLocal<UserEntity> threadLocal=new ThreadLocal<UserEntity>();
