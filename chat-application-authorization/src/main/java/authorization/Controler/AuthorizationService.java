@@ -36,8 +36,7 @@ public class AuthorizationService{
 		 * @param processLoginRequest- if value is true metod does not call metod existsBy..
 		 * Instead, it call metod findBy... and save returned value to threadLocalValue, if returned Optional would be empty
 		 * metod return false */
-		public boolean doesUserExist(UserComunicationDTO user,boolean processLoginRequest,
-				ThreadLocal<UserEntity>userEntity) {
+		public boolean doesUserExist(UserComunicationDTO user,boolean processLoginRequest) {
 			if(!processLoginRequest)return this.userEntityRepo.existsByEmailOrPhoneAndCountryPreflix(user.getEmail(),user.getPhone(),user.getPhonePreflix());
 			Optional<UserEntity> opt=this.userEntityRepo.findByEmailOrPhoneAndCountryPreflix(user.getEmail(), user.getPhone(), user.getPhonePreflix());
 			if(opt.isEmpty()) {
@@ -49,8 +48,7 @@ public class AuthorizationService{
 		
 		}
 		@Transactional
-		public void register(UserComunicationDTO user,UserAuthPasswordDTO password,
-				ThreadLocal<UserEntity>userEntity) {
+		public void register(UserComunicationDTO user,UserAuthPasswordDTO password) {
 			
 			UserEntity userEnt=new UserEntity();
 			userEnt.setEmail(user.getEmail());
@@ -66,7 +64,7 @@ public class AuthorizationService{
 		}
 		
 		/**Metod compare sent password and saved password in database */
-		public boolean login(UserAuthPasswordDTO password,ThreadLocal<UserEntity>userEntity) {
+		public boolean login(UserAuthPasswordDTO password) {
 			long userID=userEntity.get().getUserId();
 			Optional <UserAuthEntity> user=this.passwordRepo.findById(userID);
 				if(user.isEmpty()) {
@@ -86,7 +84,7 @@ public class AuthorizationService{
 		private BCryptPasswordEncoder BCryptEncoder;
 
 
-		public void FinishRegistration(UserProfileRegistrationDTO user,UserEntity databaseUser) {
+		public void FinishRegistration(UserProfileRegistrationDTO usery) {
 			databaseUser.setNick(user.getNickName());
 			databaseUser.setSerName(user.getSerName());
 			databaseUser.setLastName(user.getLastName());

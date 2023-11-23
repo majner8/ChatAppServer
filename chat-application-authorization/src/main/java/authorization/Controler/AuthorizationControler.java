@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,13 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import AuthorizationDTO.TokenDTO;
 import User.UserProfileDTO.UserProfileRegistrationDTO;
-import authorization.RequestScope_UserEntity;
+import authorization.Authorization_RequestScope_UserEntity;
 import authorization.Security.jwtToken;
 import chat_application_DTO.UserDTO.UserAuthorizationDTO;
 import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
+import chat_application_common_Part.Security.CustomSecurityContextHolder;
 import chat_application_common_Part.Security.DeviceIDRequestScope;
 import database.Authorization.deviceIdGenerationRepository;
 import database.User.UserAuthEntityRepository;
@@ -31,6 +33,95 @@ import database.User.UserEntityRepository;
 
 @RequestMapping(AuthorizationPath.authorizationPreflix)
 public class AuthorizationControler {
+	
+	public static class AuthorizationControlerAuthorization{
+	
+		@Autowired
+		private AuthorizationService.AuthorizationServiceAuthorizationProcess autorizationService;
+		@Autowired
+		private Authorization_RequestScope_UserEntity userEntity;
+		@Autowired
+		private jwtToken.jwtTokenGeneratorInterface jwtToken;
+		public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserAuthorizationDTO 
+				userData,
+				@RequestAttribute String deviceID){
+			
+			if(this.autorizationService.doesUserExist(userData.getProfile(),false)) {
+				//userExist
+				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Email or Phone has been registred yet");
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+						
+			}
+		
+			try {
+				this.autorizationService.register(userData.getProfile(),userData.getPassword());
+			}
+			catch(DataIntegrityViolationException e) {
+				//email or password was created
+				Log4j2.log.warn(Log4j2.MarkerLog.Authorization.getMarker(),"Email or Phone has been registred yet");
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User was registred");
+			TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, this.userEntity.getUserEntity());
+			
+			return ResponseEntity.ok(token);
+			
+		}
+		
+		public ResponseEntity<TokenDTO> login(@RequestBody @Valid UserAuthorizationDTO 
+				userData,
+				@RequestAttribute String deviceID){
+			if(!this.autorizationService.doesUserExist(userData.getProfile(), true)) {
+				//email/phone has been registred
+				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone were incorecct, user was not found");
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			if(!this.autorizationService.login(userData.getPassword())) {
+				//incorect password
+				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone or password were incorecct");
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, this.userEntity.getUserEntity());
+			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),
+					"Login was sucesfull");
+			return ResponseEntity.ok(token);
+			
+		}
+	}
+	
+	public static class AuthorizationControlerFinishAuthorization{
+		@Autowired
+		private AuthorizationService.AuthorizationServiceFinishAuthorization autorizationService;
+		@Autowired
+		private jwtToken.jwtTokenGeneratorInterface jwtToken;
+		@Autowired
+		private Authorization_RequestScope_UserEntity RequestScopeUserEntity;
+		
+		public ResponseEntity<TokenDTO>finishRegistration(@RequestBody @Valid UserProfileRegistrationDTO user){
+			HttpStatus status;
+			try {
+				this.autorizationService.FinishRegistration(user);
+				status=HttpStatus.OK;
+				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User finish registration");
+
+			}
+			catch(OptimisticLockException e) {
+				//conflict, user finish registration from diferent device
+				//just inform user
+				status=HttpStatus.CONFLICT;
+				Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"FinishRegistratrion task was not sucesfull, registration was finished before");
+			}
+			
+			Log4j2.log.debug(Log4j2.MarkerLog.Authorization.getMarker(),"I am generating fully authorizated token");
+			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
+			TokenDTO token=
+					this.jwtToken.generateAuthorizationToken(deviceID, this.RequestScopeUserEntity.getUserEntity());
+			return ResponseEntity.status(status)
+					.body(token);
+			
+			}
+	}
+	
 	@Autowired
 	private jwtToken.jwtTokenGeneratorInterface jwtToken;
 	@Autowired
@@ -54,70 +145,6 @@ public class AuthorizationControler {
 		
 	}
 	
-	public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserAuthorizationDTO 
-			userData){
-		
-		if(this.autorizationService.doesUserExist(userData.getProfile(),false)) {
-			//userExist
-			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Email or Phone has been registred yet");
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-					
-		}
-	
-		try {
-			this.autorizationService.register(userData.getProfile(),userData.getPassword());
-		}
-		catch(DataIntegrityViolationException e) {
-			//email or password was created
-			Log4j2.log.warn(Log4j2.MarkerLog.Authorization.getMarker(),"Email or Phone has been registred yet");
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		}
-		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User was registred");
-		UserEntity ent=this.requestScopeValue.getUserEntity();
-		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
-		
-		return ResponseEntity.ok(token);
-		
-	}
-	
-	public ResponseEntity<TokenDTO> login(@RequestBody @Valid UserAuthorizationDTO 
-			userData){
-		if(!this.autorizationService.doesUserExist(userData.getProfile(), true)) {
-			//email/phone has been registred
-			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone were incorecct, user was not found");
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-		if(!this.autorizationService.login(userData.getPassword())) {
-			//incorect password
-			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"Login was not sucessfull, email/phone or password were incorecct");
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-		UserEntity ent=this.requestScopeValue.getUserEntity();
-		TokenDTO token=this.jwtToken.generateAuthorizationToken(deviceID, ent);
-		Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),
-				"Login was sucesfull");
-		return ResponseEntity.ok(token);
-		
-	}
-	public ResponseEntity<TokenDTO>finishRegistration(@RequestBody @Valid UserProfileRegistrationDTO user){
-		HttpStatus status;
-		try {
-			this.autorizationService.FinishRegistration(user, this.requestScopeValue.getUserEntity());
-			status=HttpStatus.OK;
-			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"User finish registration");
 
-		}
-		catch(OptimisticLockException e) {
-			//conflict, user finish registration from diferent device
-			//just inform user
-			status=HttpStatus.CONFLICT;
-			Log4j2.log.info(Log4j2.MarkerLog.Authorization.getMarker(),"FinishRegistratrion task was not sucesfull, registration was finished before");
-		}
-		Log4j2.log.debug(Log4j2.MarkerLog.Authorization.getMarker(),"I am generating fully authorizated token");
-		TokenDTO token=
-				this.jwtToken.generateAuthorizationToken(this.requestScopeValue.getDeviceID(), this.requestScopeValue.getUserEntity());
-		return ResponseEntity.status(status)
-				.body(token);
-		}
 }
 

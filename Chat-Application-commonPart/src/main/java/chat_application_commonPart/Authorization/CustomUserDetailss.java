@@ -7,18 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import chat_application_commonPart.Logger.Log4j2;
 
-public class CustomUserDetails implements UserDetails{
+public class CustomUserDetailss implements UserDetails{
 
 	
 	private Collection<? extends GrantedAuthority> autority;
 	private long DatabaseVersion;
 	private String userID;
-	private int deviceId;
-	private long logId;
 	private String WebSocketId;
-	public int getDeviceId() {
-		return deviceId;
-	}
 
 	/**Metod create new CustomUserDetails object
 	 *  @return null if autority equal null, or userId is not an Integer */

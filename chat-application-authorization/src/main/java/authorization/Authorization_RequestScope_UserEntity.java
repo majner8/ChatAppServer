@@ -7,7 +7,7 @@ import database.User.UserEntity;
 
 @Component
 @RequestScope
-public class RequestScope_UserEntity {
+public class Authorization_RequestScope_UserEntity {
 
 	private UserEntity userEntity;
 

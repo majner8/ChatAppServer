@@ -1,7 +1,8 @@
-package authorization.Security;
+package chat_application_common_Part.Security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
 public class CustomSecurityContextHolder implements SecurityContextHolderStrategy {
@@ -32,8 +33,21 @@ public class CustomSecurityContextHolder implements SecurityContextHolderStrateg
 		return this.threadLocal.get();
 	}
 
+	/**
+     * Retrieves the custom security context.
+     * @return CustomSecurityContext or null if the context is not of the expected type.
+     */
+    public static CustomSecurityContext getCustomSecurityContext() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        if (context instanceof CustomSecurityContext) {
+            return (CustomSecurityContext) context;
+        }
+        return null; // or throw an exception based on your error handling strategy
+    }
+    
 	public static class CustomSecurityContext implements SecurityContext{
 		private Authentication aut;
+		private String deviceID;
 		//other deviceId information
 		@Override
 		public Authentication getAuthentication() {
@@ -45,6 +59,16 @@ public class CustomSecurityContextHolder implements SecurityContextHolderStrateg
 		public void setAuthentication(Authentication authentication) {
 			// TODO Auto-generated method stub
 			this.aut=authentication;
+		}
+
+
+
+		public String getDeviceID() {
+			return deviceID;
+		}
+
+		public void setDeviceID(String deviceID) {
+			this.deviceID = deviceID;
 		}
 		
 	}
