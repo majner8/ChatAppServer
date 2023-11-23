@@ -1,6 +1,8 @@
 package authorization.Security.Filter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -9,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -16,8 +20,10 @@ import authorization.Security.jwtToken;
 import authorization.Security.Filter.FilterService.Filter;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
 import chat_application_common_Part.Security.CustomUserDetails;
+import chat_application_common_Part.Security.FilterManagement;
+import chat_application_common_Part.Security.RoleManagement;
 
-public class jwtFilterUserAuthorization extends Filter{
+public class jwtFilterUserAuthorization extends Filter implements FilterManagement.authorizationUserFilter{
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -29,12 +35,21 @@ public class jwtFilterUserAuthorization extends Filter{
 			return;
 		}
 		DecodedJWT token=super.tokenValidator.jwtTokenAuthorizationUserTokenValidator(request);
-		CustomUserDetails user=new CustomUserDetails(Long.valueOf(token.getSubject()),token.getClaim(jwtToken.authoriClainName).asLong());
+		List<SimpleGrantedAuthority> authority=new ArrayList<SimpleGrantedAuthority>();
+		authority.add(new SimpleGrantedAuthority(RoleManagement.deviceIDRole));
+		CustomUserDetails user=new CustomUserDetails(Long.valueOf(token.getSubject()),token.getClaim(jwtToken.authoriClainName).asLong()
+				,authority);
 		
 		Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()); 
 		CustomSecurityContextHolder.getCustomSecurityContext().setAuthentication(auth);
 		filterChain.doFilter(request, response);
 		return;
+	}
+
+	@Override
+	public OncePerRequestFilter getFilter() {
+		// TODO Auto-generated method stub
+		return this;
 	}
 
 }
