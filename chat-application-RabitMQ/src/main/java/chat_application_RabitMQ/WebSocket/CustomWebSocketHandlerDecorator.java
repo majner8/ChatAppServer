@@ -1,4 +1,4 @@
-package chat.application.WebSocket.HandShake;
+package chat_application_RabitMQ.WebSocket;
 
 import java.util.Map;
 
