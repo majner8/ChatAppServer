@@ -14,7 +14,7 @@ public interface SecurityProperties {
 	public String getTokenAuthorizationUserHederName();
 	public Calendar getJwtTokenDeviceIdDuration();
 	public Calendar getJwtTokenAuthorizationUserDuration();
-	
+	public String getDeviceIDAuthority();
 
 	
 }

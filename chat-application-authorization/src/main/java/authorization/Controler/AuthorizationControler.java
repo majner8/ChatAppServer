@@ -21,7 +21,6 @@ import User.UserProfileDTO.UserProfileRegistrationDTO;
 import authorization.Authorization_RequestScope_UserEntity;
 import authorization.Security.jwtToken;
 import chat_application_DTO.UserDTO.UserAuthorizationDTO;
-import chat_application_commonPart.Authorization.HttpServletRequestInetAdress;
 import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.httpEndPointPath.AuthorizationPath;

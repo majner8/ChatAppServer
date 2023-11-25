@@ -191,6 +191,7 @@
        	<module>chat-application-starter</module>
        	<module>chat-application-authorization</module>
        	<module>Chat-Application-commonPart</module>
+       	<module>chat-application-WebSocket</module>
        </modules>
   
 </project>
