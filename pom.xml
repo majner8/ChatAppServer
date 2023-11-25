@@ -192,6 +192,7 @@
        	<module>chat-application-authorization</module>
        	<module>Chat-Application-commonPart</module>
        	<module>chat-application-WebSocket</module>
+       	<module>chat-application-RabitMQ</module>
        </modules>
   
 </project>

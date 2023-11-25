@@ -5,6 +5,12 @@
     <artifactId>chat-application</artifactId>
     <version>1</version>
   </parent>
-  <artifactId>chat-application-WebSocket</artifactId>
-  <name>chat-application-WebSocket</name>
+  <artifactId>chat-application-RabitMQ</artifactId>
+  <dependencies>
+  	<dependency>
+  		<groupId>chat-application-database</groupId>
+  		<artifactId>chat-application-database</artifactId>
+  		<version>1</version>
+  	</dependency>
+  </dependencies>
 </project>

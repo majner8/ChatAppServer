@@ -7,9 +7,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails{
 
-	private final long userID;
-	private final long databaseVersion;
-	private final Collection<? extends GrantedAuthority> authority;
+	protected final long userID;
+	protected final long databaseVersion;
+	protected final Collection<? extends GrantedAuthority> authority;
 	
 	public CustomUserDetails(long userID,long databaseVersion,
 			Collection<? extends GrantedAuthority> authority) {
@@ -65,4 +65,21 @@ public class CustomUserDetails implements UserDetails{
 		return this.databaseVersion;
 	}
 
+	public static class WebSocketCustomUserDetails extends CustomUserDetails{
+		private final long userActivityID;
+		public WebSocketCustomUserDetails(long userID, long databaseVersion,
+				Collection<? extends GrantedAuthority> authority,long userActivityID) {
+			super(userID, databaseVersion, authority);
+			this.userActivityID=userActivityID;
+		}
+		public WebSocketCustomUserDetails(CustomUserDetails user,long userActivityID) {
+			super(user.getUserID(), user.getDatabaseVersion(), user.getAuthorities());
+			this.userActivityID=userActivityID;
+		}
+		
+		public long getUserActivityID() {
+			return userActivityID;
+		}
+		
+	}
 }
