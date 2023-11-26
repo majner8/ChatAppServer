@@ -73,7 +73,7 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
     	// Logic after connection is established
     	
     	//mark user as active is not necessary, is done during handshake
-    	//start consuming from rabitMQ
+    	//cannot start consuming, because sometimes, user have to make synchronization
     	
         super.afterConnectionEstablished(session);
     }
