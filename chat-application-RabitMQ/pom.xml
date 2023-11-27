@@ -12,5 +12,10 @@
   		<artifactId>chat-application-database</artifactId>
   		<version>1</version>
   	</dependency>
+  	<dependency>
+    <groupId>org.springframework.amqp</groupId>
+    <artifactId>spring-rabbit</artifactId>
+</dependency>
+
   </dependencies>
 </project>

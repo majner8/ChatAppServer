@@ -7,13 +7,17 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import chat_application_RabitMQ.RabitMQQueueNameService;
+import chat_application_common_Part.RabitMQ.ActiveUserWSConnection;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
+import chat_application_common_Part.Security.CustomSecurityContextHolder.CustomSecurityContext;
 import chat_application_common_Part.Security.CustomUserDetails;
 import database.User.ActivityUserEntity;
 import database.User.ActivityUserEntityRepository;
@@ -24,8 +28,12 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 
 	@Autowired
 	private ActivityUserEntityRepository activityRepo;
-	
+	@Autowired
+	private ActiveUserWSConnection<String,String> activeUser;
 	private final ThreadLocal<ActivityUserEntity> userActivity=new ThreadLocal<ActivityUserEntity>();
+
+	public static final String CopiedSecurityConfigAttribute="";
+	
 	public CustomWebSocketHandlerDecorator(WebSocketHandler delegate) {
         super(delegate);
     }
@@ -54,7 +62,8 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 	}
 
 	@Override
-	public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
+	public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, 
+			WebSocketHandler wsHandler,
 			Exception exception) {
 		
 		// TODO Auto-generated method stub
@@ -64,14 +73,20 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 			activity.setLogout(activity.getLogin());
 			this.activityRepo.save(activity);
 		}
+		else {
+		
+		}
 		this.userActivity.remove();
 	}
 	
-
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
     	// Logic after connection is established
-    	
+    	CustomSecurityContext securityContext = (CustomSecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+
+    	String deviceID=securityContext.getDeviceID();
+    	long userID=securityContext.getUserID();
+    	this.activeUser.put(RabitMQQueueNameService.QueueGeneration(userID, deviceID), session.getId());
     	//mark user as active is not necessary, is done during handshake
     	//cannot start consuming, because sometimes, user have to make synchronization
     	
@@ -80,7 +95,14 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        // Logic before connection is closed
+    	//remove active connection from map
+    	CustomSecurityContext securityContext = (CustomSecurityContext) session.getAttributes().get("SPRING_SECURITY_CONTEXT");
+
+    	String deviceID=securityContext.getDeviceID();
+    	long userID=securityContext.getUserID();
+    	this.activeUser.remove(RabitMQQueueNameService.QueueGeneration(userID, deviceID), session.getId());
+
+    	// Logic before connection is closed
         super.afterConnectionClosed(session, closeStatus);
     }
 
