@@ -2,7 +2,10 @@ package chat_application_RabitMQ.WebSocket;
 
 import java.util.Map;
 
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +18,7 @@ import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import chat_application_RabitMQ.RabitMQQueueNameService;
+import chat_application_RabitMQ.ConsumingMessage.RabitMQMessageListener;
 import chat_application_common_Part.RabitMQ.ActiveUserWSConnection;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
 import chat_application_common_Part.Security.CustomSecurityContextHolder.CustomSecurityContext;
@@ -26,13 +30,15 @@ import database.User.ActivityUserEntityRepository;
 
 public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator implements HandshakeInterceptor {
 
+	public static final String sessionRabitMQListenerName="";
 	@Autowired
 	private ActivityUserEntityRepository activityRepo;
 	@Autowired
 	private ActiveUserWSConnection<String,String> activeUser;
 	private final ThreadLocal<ActivityUserEntity> userActivity=new ThreadLocal<ActivityUserEntity>();
 
-	public static final String CopiedSecurityConfigAttribute="";
+	  @Autowired
+	 private ConnectionFactory RabitMQconnectionFactory;
 	
 	public CustomWebSocketHandlerDecorator(WebSocketHandler delegate) {
         super(delegate);
@@ -57,7 +63,11 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 		Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities()); 
 		CustomSecurityContextHolder.getCustomSecurityContext().setAuthentication(auth);
 		
+		//add container which manage listening queue
 		
+		SimpleMessageListenerContainer container=new SimpleMessageListenerContainer(this.RabitMQconnectionFactory);
+		container.setMessageListener(this.getMessageListener());
+		attributes.put(this.sessionRabitMQListenerName, container);
 		return true;
 	}
 
@@ -90,7 +100,12 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
     	//mark user as active is not necessary, is done during handshake
     	//cannot start consuming, because sometimes, user have to make synchronization
     	
-        super.afterConnectionEstablished(session);
+    	//add session id to RabitMQlistener
+    	SimpleMessageListenerContainer container=(SimpleMessageListenerContainer)session.getAttributes().get(this.sessionRabitMQListenerName);
+    	RabitMQMessageListener rabitListener=(RabitMQMessageListener)container.getMessageListener();
+    	rabitListener.setWebSocketSession(session);
+    	
+    	super.afterConnectionEstablished(session);
     }
 
     @Override
@@ -105,5 +120,8 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
     	// Logic before connection is closed
         super.afterConnectionClosed(session, closeStatus);
     }
-
+    @Lookup
+    public RabitMQMessageListener getMessageListener() {
+    	return null;
+    }
 }
