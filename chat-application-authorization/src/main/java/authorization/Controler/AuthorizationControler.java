@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,8 @@ public class AuthorizationControler {
 		private Authorization_RequestScope_UserEntity userEntity;
 		@Autowired
 		private jwtToken.jwtTokenGeneratorInterface jwtToken;
+		
+		@PostMapping(AuthorizationPath.registerPath)
 		public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserAuthorizationDTO 
 				userData){
 			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
