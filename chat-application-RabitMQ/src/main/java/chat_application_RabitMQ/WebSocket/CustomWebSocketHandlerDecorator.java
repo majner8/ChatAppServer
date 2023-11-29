@@ -17,7 +17,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.WebSocketHandlerDecorator;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import chat_application_RabitMQ.RabitMQQueueNameService;
+import chat_application_RabitMQ.RabitMQQueueService;
 import chat_application_RabitMQ.ConsumingMessage.RabitMQMessageListener;
 import chat_application_common_Part.RabitMQ.ActiveUserWSConnection;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
@@ -96,7 +96,7 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 
     	String deviceID=securityContext.getDeviceID();
     	long userID=securityContext.getUserID();
-    	this.activeUser.put(RabitMQQueueNameService.QueueGeneration(userID, deviceID), session.getId());
+    	this.activeUser.put(RabitMQQueueService.QueueGeneration(userID, deviceID), session.getId());
     	//mark user as active is not necessary, is done during handshake
     	//cannot start consuming, because sometimes, user have to make synchronization
     	
@@ -115,7 +115,7 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator i
 
     	String deviceID=securityContext.getDeviceID();
     	long userID=securityContext.getUserID();
-    	this.activeUser.remove(RabitMQQueueNameService.QueueGeneration(userID, deviceID), session.getId());
+    	this.activeUser.remove(RabitMQQueueService.QueueGeneration(userID, deviceID), session.getId());
 
     	// Logic before connection is closed
         super.afterConnectionClosed(session, closeStatus);

@@ -193,6 +193,7 @@
        	<module>Chat-Application-commonPart</module>
        	<module>chat-application-WebSocket</module>
        	<module>chat-application-RabitMQ</module>
+       	<module>chat-application-Chat</module>
        </modules>
   
 </project>
