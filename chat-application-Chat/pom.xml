@@ -6,4 +6,11 @@
     <version>1</version>
   </parent>
   <artifactId>chat-application-Chat</artifactId>
+  <dependencies>
+  	<dependency>
+  		<groupId>chat-application-database</groupId>
+  		<artifactId>chat-application-database</artifactId>
+  		<version>1</version>
+  	</dependency>
+  </dependencies>
 </project>

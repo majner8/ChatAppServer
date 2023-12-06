@@ -25,6 +25,7 @@ import chat_application_DTO.UserDTO.UserAuthorizationDTO;
 import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
+import chat_application_common_Part.EndPoint.AuthorizationEndPoint;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
 import chat_application_common_Part.Security.DeviceIDRequestScope;
 import database.Authorization.deviceIdGenerationRepository;
@@ -36,7 +37,7 @@ import database.User.UserEntityRepository;
 @RequestMapping(AuthorizationPath.authorizationPreflix)
 public class AuthorizationControler {
 	
-	public static class AuthorizationControlerAuthorization{
+	public static class AuthorizationControlerAuthorization implements AuthorizationEndPoint.AuthorizationEndPointAuthorization{
 	
 		@Autowired
 		private AuthorizationService.AuthorizationServiceAuthorizationProcess autorizationService;
@@ -46,7 +47,7 @@ public class AuthorizationControler {
 		private jwtToken.jwtTokenGeneratorInterface jwtToken;
 		
 		@PostMapping(AuthorizationPath.registerPath)
-		public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserAuthorizationDTO 
+		public ResponseEntity<TokenDTO> register(UserAuthorizationDTO 
 				userData){
 			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
 			if(this.autorizationService.doesUserExist(userData.getProfile(),false)) {
@@ -71,7 +72,7 @@ public class AuthorizationControler {
 			
 		}
 		
-		public ResponseEntity<TokenDTO> login(@RequestBody @Valid UserAuthorizationDTO 
+		public ResponseEntity<TokenDTO> login(UserAuthorizationDTO 
 				userData){
 			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
 			if(!this.autorizationService.doesUserExist(userData.getProfile(), true)) {
@@ -92,7 +93,7 @@ public class AuthorizationControler {
 		}
 	}
 	
-	public static class AuthorizationControlerFinishAuthorization{
+	public static class AuthorizationControlerFinishAuthorization implements AuthorizationEndPoint.AuthorizationEndPointFinishAuthorization{
 		@Autowired
 		private AuthorizationService.AuthorizationServiceFinishAuthorization autorizationService;
 		@Autowired
@@ -100,7 +101,7 @@ public class AuthorizationControler {
 		@Autowired
 		private Authorization_RequestScope_UserEntity RequestScopeUserEntity;
 		
-		public ResponseEntity<TokenDTO>finishRegistration(@RequestBody @Valid UserProfileRegistrationDTO user){
+		public ResponseEntity<TokenDTO>finishRegistration(UserProfileRegistrationDTO user){
 			HttpStatus status;
 			String deviceID=CustomSecurityContextHolder.getCustomSecurityContext().getDeviceID();
 			long userID=CustomSecurityContextHolder.getCustomSecurityContext().getUserID();

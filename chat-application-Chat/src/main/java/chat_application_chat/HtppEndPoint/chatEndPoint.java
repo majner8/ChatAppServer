@@ -1,5 +1,6 @@
 package chat_application_chat.HtppEndPoint;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,25 +11,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import ChatDTO.ChatInformationDTO;
 import ChatDTO.MessageDTO;
 import ChatDTO.UserChatOverViewDTO;
+import chat_application_common_Part.EndPoint.htppChatEndPoint;
 
-public class SearchingHistoryControler {
+public class chatEndPoint implements htppChatEndPoint {
 
 	@Autowired
 	private SearchingHistoryService service;
+
 	@GetMapping("/{chatID}/{offSetStart}/{offSetEnd}")
 	public ResponseEntity<Set<MessageDTO>> loadChatHistory(
-			@PathVariable String chatID,
-			@PathVariable long offSetStart,
-/*have to be some limit security*/		@PathVariable long offSetEnd){
-		Set<MessageDTO> messages=this.service.loadChatHistory(chatID, offSetStart, offSetEnd);
+			 String chatID,
+			 long offSetStart,
+			 long offSetEnd){
+		List<MessageDTO> messages=this.service.loadChatHistory(chatID, offSetStart, offSetEnd);
 		
 		return null;
 	}
 	@GetMapping("/UserID/{offSetStart}/{offSetEnd}")
 	public ResponseEntity<UserChatOverViewDTO> loadUserChatOverview(
-			@PathVariable long UserID,
-			@PathVariable long offSetStart,
-			@PathVariable long offSetEnd
+			 long UserID,
+			 long offSetStart,
+			 long offSetEnd
 			) {
 		return null;
 	}
