@@ -8,22 +8,6 @@ import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToOne;
 
 
-@NamedNativeQuery(
-		  name = "getLastMessages",
-		  query ="With userChat as "
-		  		+ "(select *from "+ChatEntity.chatEntityTableName
-		  		+ " as chatname"
-		  		+ " where "+ ChatEntity.chatIDColumnName +"= :chatID"+")"
-		  		+ "join "+MessageEntity.messageEntityTableName
-		  		+ " messages"
-		  		+ " on"
-		  		+ ""
-		  		+ "Select* from( "
-		  		+ ""
-		  				+ ")"
-		  				+ ""
-		  				+ ""
-		  ,resultSetMapping = "SummaryOrders")
 @Entity()
 public class MessageEntity {
 	public static final String messageEntityTableName="";

@@ -32,7 +32,7 @@ public class chatEndPoint implements htppChatEndPoint {
 	}
 	public ResponseEntity<ChatInformationDTO> getChatInformation(
 			 String chatID) {
-		
+		chatEntityRepository
 		return null;
 	}
 	public ResponseEntity<MessageDTO> getMessage(

@@ -23,6 +23,12 @@ public interface MessageRepositoryEntity extends JpaRepository<MessageEntity,Str
     	Pageable page=PageRequest.of((int)startPage,(int)(size+difference),Sort.by(MessageEntity.JPQLorderName));
     	return this.findByChatId(chatID, page);
     }
+    /**Metod return list of first */
+    default List<MessageEntity>getUserMessageOverview(long UserID,
+    		int offSetBegin,int offSetEnd){
+    	
+    	return null;
+    }
     
 	
 }

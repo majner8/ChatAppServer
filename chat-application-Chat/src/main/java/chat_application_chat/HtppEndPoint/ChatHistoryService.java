@@ -4,16 +4,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
+import ChatDTO.ChatInformationDTO;
 import ChatDTO.MessageDTO;
 import ChatDTO.UserChatOverViewDTO;
+import database.Chat.ChatEntity;
 import database.Chat.MessageEntity;
 import database.Chat.MessageRepositoryEntity;
+import database.Chat.chatEntityRepository;
 
 public class ChatHistoryService {
 
 	@Autowired
 	private MessageRepositoryEntity messageRepo;
+	@Autowired
+	private chatEntityRepository chatRepo;
 	
 	public List<MessageDTO> loadChatHistory(
 			 String chatID,
@@ -44,6 +50,14 @@ public class ChatHistoryService {
 				 long offSetStart,
 				 long offSetEnd
 				) {
+			return null;
+		}
+		
+		public ChatInformationDTO getChatInformation(
+				 String chatID) {
+			ChatEntity chatEnt= this.chatRepo.findById(chatID);
+			ChatInformationDTO chat=new ChatInformationDTO();
+			
 			return null;
 		}
 }
