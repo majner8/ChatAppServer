@@ -1,6 +1,7 @@
 package database.Chat;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,5 @@ public interface MessageRepositoryEntity extends JpaRepository<MessageEntity,Str
     	
     	return null;
     }
-    
-	
+	Optional<MessageEntity> findByChatIDAndOrder(String chatID,long order);
 }
