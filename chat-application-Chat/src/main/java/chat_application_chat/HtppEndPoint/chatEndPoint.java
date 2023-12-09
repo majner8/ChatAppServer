@@ -13,7 +13,7 @@ import chat_application_common_Part.EndPoint.htppChatEndPoint;
 public class chatEndPoint implements htppChatEndPoint {
 
 	@Autowired
-	private SearchingHistoryService service;
+	private ChatHistoryService service;
 
 	public ResponseEntity<List<MessageDTO>> loadChatHistory(
 			 String chatID,
