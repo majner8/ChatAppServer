@@ -22,17 +22,11 @@ import User.UserProfileDTO.UserProfileRegistrationDTO;
 import authorization.Authorization_RequestScope_UserEntity;
 import authorization.Security.jwtToken;
 import chat_application_DTO.UserDTO.UserAuthorizationDTO;
-import chat_application_commonPart.Config.DurationService;
 import chat_application_commonPart.Logger.Log4j2;
 import chat_application_commonPart.httpEndPointPath.AuthorizationPath;
 import chat_application_common_Part.EndPoint.AuthorizationEndPoint;
 import chat_application_common_Part.Security.CustomSecurityContextHolder;
-import chat_application_common_Part.Security.DeviceIDRequestScope;
-import database.Authorization.deviceIdGenerationRepository;
 import database.Exception.UserWasNotFoundInDatabaseException;
-import database.User.UserAuthEntityRepository;
-import database.User.UserEntity;
-import database.User.UserEntityRepository;
 
 @RequestMapping(AuthorizationPath.authorizationPreflix)
 public class AuthorizationControler {
