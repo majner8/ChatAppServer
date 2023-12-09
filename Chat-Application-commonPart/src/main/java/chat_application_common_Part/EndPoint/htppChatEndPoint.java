@@ -1,5 +1,6 @@
 package chat_application_common_Part.EndPoint;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import ChatDTO.UserChatOverViewDTO;
 public interface htppChatEndPoint {
 
 	@GetMapping("/{chatID}/{offSetStart}/{offSetEnd}")
-	public ResponseEntity<Set<MessageDTO>> loadChatHistory(
+	public ResponseEntity<List<MessageDTO>> loadChatHistory(
 			@PathVariable String chatID,
 			@PathVariable long offSetStart,
 /*have to be some limit security*/		@PathVariable long offSetEnd);

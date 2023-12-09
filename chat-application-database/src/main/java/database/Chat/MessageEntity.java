@@ -9,13 +9,25 @@ import javax.persistence.OneToOne;
 
 
 @NamedNativeQuery(
-		  name = "SummaryOrders",
-		  query ="With"
+		  name = "getLastMessages",
+		  query ="With userChat as "
+		  		+ "(select *from "+ChatEntity.chatEntityTableName
+		  		+ " as chatname"
+		  		+ " where "+ ChatEntity.chatIDColumnName +"= :chatID"+")"
+		  		+ "join "+MessageEntity.messageEntityTableName
+		  		+ " messages"
+		  		+ " on"
+		  		+ ""
+		  		+ "Select* from( "
+		  		+ ""
+		  				+ ")"
+		  				+ ""
+		  				+ ""
 		  ,resultSetMapping = "SummaryOrders")
 @Entity()
 public class MessageEntity {
 	public static final String messageEntityTableName="";
-	
+
 	public static final String chatIDColumnName="";
 	public static final String senderIDColumnName="";
 	public static final String messageIDColumnName="";
@@ -24,6 +36,8 @@ public class MessageEntity {
 	public static final String wasMessageRemovedColumnName="";
 	public static final String orderColumnName="";
 	
+	public static final String ColumnNamereferenctMessageID="";
+	public static final String ColumnNameextendsAction="";
 	public static final String JPQLorderName="order"; 
 	@Column(name=orderColumnName)
 	private long order;
@@ -40,11 +54,15 @@ public class MessageEntity {
 	private LocalDateTime receivedTime;
 	@Column(name=MessageEntity.wasMessageRemovedColumnName)
 	private boolean wasMessageRemoved=false;
-	
-    @OneToOne(mappedBy = "messageID", optional=true)
-	private MessageEntityNotification notification;
-
-    
+	@Column(name=MessageEntity.ColumnNamereferenctMessageID)
+    private String referenctMessageID;
+	@Column(name=MessageEntity.ColumnNamereferenctMessageID)
+    private extendsMessageAction extendsAction;
+    /**represent extends Message, contain type of action
+     * such as type of reaction to message or just reply e.t.c */
+    public static enum extendsMessageAction{
+    	
+    }
     
 	public long getOrder() {
 		return order;
@@ -79,6 +97,7 @@ public class MessageEntity {
 	}
 
 	public String getMessage() {
+		
 		return message;
 	}
 
@@ -102,13 +121,22 @@ public class MessageEntity {
 		this.wasMessageRemoved = wasMessageRemoved;
 	}
 
-	public MessageEntityNotification getNotification() {
-		return notification;
+	public String getReferenctMessageID() {
+		return referenctMessageID;
 	}
 
-	public void setNotification(MessageEntityNotification notification) {
-		this.notification = notification;
+	public void setReferenctMessageID(String referenctMessageID) {
+		this.referenctMessageID = referenctMessageID;
 	}
-	
+
+	public extendsMessageAction getExtendsAction() {
+		return extendsAction;
+	}
+
+	public void setExtendsAction(extendsMessageAction extendsAction) {
+		this.extendsAction = extendsAction;
+	}
+
+
 	
 }

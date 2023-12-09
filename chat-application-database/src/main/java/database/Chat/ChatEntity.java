@@ -9,6 +9,8 @@ import javax.persistence.OneToMany;
 
 @Entity()
 public class ChatEntity {
+	public static final String chatEntityTableName="";
+	
 	public static final String chatEntityColumnName="";
 	
 	public static final String doesIsGroupChatColumnName="";

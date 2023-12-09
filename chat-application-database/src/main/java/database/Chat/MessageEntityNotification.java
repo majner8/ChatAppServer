@@ -2,6 +2,7 @@ package database.Chat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.JoinColumn;
 
 import chat_application_common_Part.Chat.MessageTypeOfAction;
@@ -19,6 +20,7 @@ public class MessageEntityNotification {
 	private MessageEntity message;
 
 	public MessageTypeOfAction getTypeOfAction() {
+		EntityManager x;
 		return typeOfAction;
 	}
 
