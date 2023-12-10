@@ -19,9 +19,9 @@ import chat_application_commonPart.Logger.Log4j2;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan(basePackages = {"Test"+"Main","Bean","chat_application_authorization","chat_application_commonPart"
-		,"chat_application_database"})
-@EntityScan(basePackages={"chat_application_database"})
-@EnableJpaRepositories(basePackages = {"chat_application_database"})
+		,"database"})
+@EntityScan(basePackages={"database"})
+@EnableJpaRepositories(basePackages = {"database"})
 @EnableAutoConfiguration
 @EnableAspectJAutoProxy
 public class Main {

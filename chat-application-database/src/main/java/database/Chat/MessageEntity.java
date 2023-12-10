@@ -10,19 +10,20 @@ import javax.persistence.OneToOne;
 
 @Entity()
 public class MessageEntity {
-	public static final String messageEntityTableName="";
+	public static final String messageEntityTableName="messages";
 
-	public static final String chatIDColumnName="";
-	public static final String senderIDColumnName="";
-	public static final String messageIDColumnName="";
-	public static final String messageColumnName="";
-	public static final String receivedTimeColumnName="";
-	public static final String wasMessageRemovedColumnName="";
-	public static final String orderColumnName="";
+	public static final String chatIDColumnName="id";
+	public static final String senderIDColumnName="sender_id";
+	public static final String messageIDColumnName="message_id";
+	public static final String messageColumnName="message";
+	public static final String receivedTimeColumnName="time_stamp";
+	public static final String wasMessageRemovedColumnName="was_message_removed";
+	public static final String orderColumnName="order_of_message";
 	
-	public static final String ColumnNamereferenctMessageID="";
-	public static final String ColumnNameextendsAction="";
+	public static final String ColumnNamereferenctMessageID="referenct_to_message_id";
+	public static final String ColumnNameextendsAction="exteds_action";
 	public static final String JPQLorderName="order"; 
+	
 	@Column(name=orderColumnName)
 	private long order;
 	@Column(name=MessageEntity.chatIDColumnName)

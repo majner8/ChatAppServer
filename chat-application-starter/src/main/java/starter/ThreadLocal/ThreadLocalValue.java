@@ -1,6 +1,6 @@
 package starter.ThreadLocal;
 
-import chat_application_database.AuthorizationEntity.UserEntity;
+import database.User.UserEntity;
 
 public class ThreadLocalValue {
 

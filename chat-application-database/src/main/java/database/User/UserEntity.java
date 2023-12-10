@@ -7,22 +7,45 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 import chat_application_commonPart.Logger.Log4j2;
 
 @Entity
 public class UserEntity {
 
-	
+	public static final String userEntityTableName="";
+	public static final String userIdColumnName="";
+	public static final String emailColumnName="";
+	public static final String countryPreflixColumnName="";
+	public static final String phoneColumnName="";
+	public static final String isUserActiveColumnName="";
+	public static final String serNameColumnName="";
+	public static final String lastNameColumnName="";
+	public static final String nickColumnName="";
+	public static final String bornDateColumnName="";
+	public static final String VersionColumnName="";
+
+	@Id
+	@Column(name=UserEntity.userIdColumnName)
 	private long userId;
+	@Column(name=UserEntity.emailColumnName)
 	private String email;
+	@Column(name=UserEntity.countryPreflixColumnName)
 	private String countryPreflix;
+	@Column(name=UserEntity.phoneColumnName)
 	private String phone;
+	@Column(name=UserEntity.isUserActiveColumnName)
 	private boolean isUserActive;
+	@Column(name=UserEntity.serNameColumnName)
 	private String serName;
+	@Column(name=UserEntity.lastNameColumnName)
 	private String lastName;
+	@Column(name=UserEntity.nickColumnName)
 	private String Nick;
+	@Column(name=UserEntity.bornDateColumnName)
 	private LocalDateTime bornDate;
 	@javax.persistence.Version
 	private long Version;

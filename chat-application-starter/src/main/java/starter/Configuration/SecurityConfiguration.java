@@ -9,7 +9,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import chat_application_common_Part.Security.FilterManagement;
-import chat_application_common_Part.Security.RoleManagement;
 import chat_application_common_Part.Security.Config.AuthorizationPath;
 
 @EnableWebSecurity
@@ -35,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		 .addFilterAfter(this.userAuthorizationFilter.getFilter(), this.deviceIDFilter.getFilter().getClass())
 		 .authorizeRequests()
 		 .antMatchers(AuthorizationPath.deviceIDPath).permitAll()
-		 .anyRequest().hasAuthority(RoleManagement.deviceIDRole)
+		// .anyRequest().hasAuthority(RoleManagement.deviceIDRole)
 		 .antMatchers(AuthorizationPath.AuthorizationPreflix+AuthorizationPath.UnAuthenticatedPreflix+"/**").permitAll()
 		 .anyRequest().fullyAuthenticated()
 		 ;

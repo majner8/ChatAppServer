@@ -2,15 +2,30 @@ package database.User;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class ActivityUserEntity {
 
+	public static final String userActivityTableName="";
+	
+
+	public static final String deviceIDEntityColumnName="";
+	public static final String userIDEntityColumnName="";
+	public static final String loginEntityColumnName="";
+	public static final String logoutEntityColumnName="";
+
+	@Column(name=ActivityUserEntity.deviceIDEntityColumnName)
 	private String deviceID;
+	@Column(name=ActivityUserEntity.userIDEntityColumnName)
 	private long userID;
+	@Id
 	private long primaryKey;
+	@Column(name=ActivityUserEntity.loginEntityColumnName)
 	private LocalDateTime login;
+	@Column(name=ActivityUserEntity.logoutEntityColumnName)
 	private LocalDateTime logout;
 	
 	public String getDeviceID() {

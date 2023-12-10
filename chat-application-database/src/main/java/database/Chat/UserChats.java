@@ -11,16 +11,16 @@ import javax.persistence.ManyToOne;
 
 @Entity()
 public class UserChats {
-	public static final String userChatsTableName="";
+	public static final String userChatsTableName="users_chat";
 	
-	public static final String userIDcolumnName="";
-	public static final String chatIDcolumnName="";
-	public static final String userNickNamecolumnName="";
-	public static final String chatNamecolumnName="";
-	public static final String memberFromcolumnName="";
-	public static final String memberUntilcolumnName="";
-	public static final String lastSeenMessageIDcolumnName="";
-	public static final String joinChatColumnName="";
+	public static final String userIDcolumnName="user_id";
+	public static final String chatIDcolumnName="chat_id";
+	public static final String userNickNamecolumnName="user_nick_name_in_chat";
+	public static final String chatNamecolumnName="chat_name_of_user";
+	public static final String memberFromcolumnName="member_from";
+	public static final String memberUntilcolumnName="member_until";
+	public static final String lastSeenMessageIDcolumnName="last_seen_message_id";
+	public static final String joinChatColumnName="appropriate_chat";
 	
 	@Column(name=UserChats.userIDcolumnName)
 	private long userID;

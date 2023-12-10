@@ -66,7 +66,10 @@ public class ChatHistoryService {
 			chat.setChatID(chatEnt.getChatID());
 			chat.setCreatedByUserID(chatEnt.getCreatedByUserID());
 			chat.setDefaultChatName(chatEnt.getDefaultChatName());
+	
+			
 			ArrayList<UserChatInformation> userInChat=new ArrayList<UserChatInformation>();
+			
 			
 			chatEnt.getChat().forEach((User)->{
 				UserChatInformation u=new UserChatInformation();

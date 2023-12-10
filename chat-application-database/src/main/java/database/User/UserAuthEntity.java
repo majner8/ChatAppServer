@@ -2,14 +2,23 @@ package database.User;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 
 import chat_application_DTO.UserDTO.UserAuthPasswordDTO;
 
-@Entity
+@Entity(name=UserAuthEntity.userAuthTableName)
 public class UserAuthEntity {
+	public final static String userAuthTableName="passwords";
+	public final static String userIdEntityColumnName="user_id";
+	public final static String passwordEntityColumnName="password";
+	public final static String lastChangePasswordEntityColumnName="last_change_password";
+
+	@Column(name=UserAuthEntity.userIdEntityColumnName)
 	private long userId;
+	@Column(name=UserAuthEntity.passwordEntityColumnName)
 	private String password;
+	@Column(name=UserAuthEntity.lastChangePasswordEntityColumnName)
 	private LocalDateTime lastChangePassword;
 	
 	public UserAuthEntity(UserAuthPasswordDTO user,long userID) {

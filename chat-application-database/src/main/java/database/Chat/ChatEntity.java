@@ -9,15 +9,11 @@ import javax.persistence.OneToMany;
 
 @Entity()
 public class ChatEntity {
-	public static final String chatEntityTableName="";
-	
-	public static final String chatEntityColumnName="";
-	
-	public static final String doesIsGroupChatColumnName="";
-	public static final String defaultChatNameColumnName="";
-	public static final String chatIDColumnName="";
-	public static final String createdByUserIDColumnName="";
-	public static final String ownerUserIDColumnName="";
+	public static final String chatEntityTableName="chats";
+		
+	public static final String defaultChatNameColumnName="default_chat_name";
+	public static final String chatIDColumnName="id";
+	public static final String createdByUserIDColumnName="created_by_user_id";
 
 
 	@Column(name=ChatEntity.defaultChatNameColumnName)
