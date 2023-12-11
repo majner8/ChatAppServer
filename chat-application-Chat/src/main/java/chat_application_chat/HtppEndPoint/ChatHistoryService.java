@@ -1,12 +1,10 @@
 package chat_application_chat.HtppEndPoint;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 
 import ChatDTO.ChatInformationDTO;
 import ChatDTO.ChatInformationDTO.UserChatInformation;
@@ -66,21 +64,20 @@ public class ChatHistoryService {
 			chat.setChatID(chatEnt.getChatID());
 			chat.setCreatedByUserID(chatEnt.getCreatedByUserID());
 			chat.setDefaultChatName(chatEnt.getDefaultChatName());
-	
 			
-			ArrayList<UserChatInformation> userInChat=new ArrayList<UserChatInformation>();
+			List<UserChatInformation> userInChat=
+					chatEnt.getChat().stream().map((User)->{
+						UserChatInformation u=new UserChatInformation();
+						u.setChatName(User.getChatName());
+						u.setLastSeenMessageID(User.getLastSeenMessageID());
+						u.setMemberFrom(User.getMemberFrom());
+						u.setMemberUntil(User.getMemberUntil());
+						u.setUserID(User.getUserID());
+						u.setUserNickName(User.getUserNickName());
+						return u;
+						
+					}).collect(Collectors.toList());
 			
-			
-			chatEnt.getChat().forEach((User)->{
-				UserChatInformation u=new UserChatInformation();
-				u.setChatName(User.getChatName());
-				u.setLastSeenMessageID(User.getLastSeenMessageID());
-				u.setMemberFrom(User.getMemberFrom());
-				u.setMemberUntil(User.getMemberUntil());
-				u.setUserID(User.getUserID());
-				u.setUserNickName(User.getUserNickName());
-				userInChat.add(u);
-			});
 			chat.setUser(userInChat);
 			return Optional.of(chat);
 		}
@@ -91,16 +88,5 @@ public class ChatHistoryService {
 		{
 			Optional<MessageEntity>mesEntOp=this.messageRepo.findByChatIDAndOrder(chatID, MessageOrder);
 			if(mesEntOp.isEmpty())return Optional.empty();
-			MessageDTO mes=new MessageDTO();
-			MessageEntity mesEnt=mesEntOp.get();
-			mes.setChatID(mesEnt.getChatID());
-			mes.setMessage(mesEnt.getMessage());
-			mes.setMessageID(mesEnt.getMessageID());
-			mes.setOrder(mesEnt.getOrder());
-			mes.setReceivedTime(mesEnt.getReceivedTime());
-			mes.setReferencMessageID(mesEnt.getReferenctMessageID());
-			mes.setSenderID(mesEnt.getSenderID());
-			mes.setTypeOfAction(mesEnt.getExtendsAction());
-			mes.setWasMessageRemoved(mesEnt.isWasMessageRemoved());
-			return Optional.of(mes);}
+		return Optional.of(mesEntOp.get().convertEntityToDTO());}
 }
