@@ -36,7 +36,11 @@
   		<version>1</version>
   		
   	</dependency>
-		
+  	<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+  	
   <dependency>
   	<groupId>chat-application</groupId>
   	<artifactId>Chat-Application-commonPart</artifactId>
